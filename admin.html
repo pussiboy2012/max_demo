@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Admin — Управление заказами</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* === Авторизация === */
+        .auth-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .auth-card {
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-card h1 {
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .auth-card p {
+            color: #94a3b8;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        /* === Общие поля === */
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        input::placeholder, textarea::placeholder { color: #475569; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 600;
+        }
+
+        /* === Кнопки === */
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary { background: #3b82f6; color: #fff; }
+        .btn-primary:hover:not(:disabled) { background: #2563eb; }
+        .btn-ghost {
+            background: transparent;
+            color: #94a3b8;
+            border: 1.5px solid #334155;
+        }
+        .btn-ghost:hover { background: #334155; color: #e2e8f0; }
+        .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+        /* === Шапка === */
+        .topbar {
+            background: #1e293b;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #334155;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar h1 {
+            font-size: 16px;
+            color: #fff;
+            font-weight: 600;
+        }
+        .topbar h1 span { color: #3b82f6; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+        /* === Двухколоночная сетка === */
+        .grid {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        /* === Карточки === */
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .field { margin-bottom: 14px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+        /* === Список заказов === */
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 6px 12px;
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .filter-chip:hover { border-color: #475569; color: #e2e8f0; }
+        .filter-chip.active {
+            background: #3b82f6;
+            color: #fff;
+            border-color: #3b82f6;
+        }
+
+        .order-item {
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .order-item:hover {
+            border-color: #3b82f6;
+            transform: translateX(2px);
+        }
+        .order-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 10px;
+        }
+        .order-id {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .order-name {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+        .order-route {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+        .order-meta {
+            font-size: 11px;
+            color: #64748b;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* === Бейдж статуса === */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .status-created { background: #334155; color: #cbd5e1; }
+        .status-created::before { background: #94a3b8; }
+        .status-awaiting_phone { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .status-awaiting_phone::before { background: #f59e0b; }
+        .status-awaiting_form { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .status-awaiting_form::before { background: #3b82f6; }
+        .status-awaiting_docs { background: rgba(168,85,247,0.15); color: #c084fc; }
+        .status-awaiting_docs::before { background: #a855f7; }
+        .status-completed { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .status-completed::before { background: #22c55e; }
+        .status-cancelled { background: rgba(239,68,68,0.15); color: #f87171; }
+        .status-cancelled::before { background: #ef4444; }
+
+        /* === Модалка === */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+        .modal-backdrop.show { display: flex; }
+        .modal {
+            background: #1e293b;
+            border-radius: 14px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+        .modal-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: #1e293b;
+            z-index: 1;
+        }
+        .modal-header h2 { font-size: 16px; color: #fff; }
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0 6px;
+            line-height: 1;
+        }
+        .modal-body { padding: 22px; }
+
+        .detail-section { margin-bottom: 20px; }
+        .detail-section:last-child { margin-bottom: 0; }
+        .detail-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 13px;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .label { color: #94a3b8; }
+        .detail-row .value { color: #e2e8f0; font-weight: 500; text-align: right; max-width: 60%; word-break: break-word; }
+
+        .checklist { display: grid; gap: 6px; }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+        .check-item.yes::before { content: '✓'; color: #4ade80; font-weight: 700; }
+        .check-item.no::before { content: '✕'; color: #f87171; font-weight: 700; }
+
+        .modal-actions {
+            padding: 16px 22px;
+            border-top: 1px solid #334155;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            position: sticky;
+            bottom: 0;
+            background: #1e293b;
+        }
+
+        /* === Link-box === */
+        .link-box {
+            background: #0f172a;
+            border: 1.5px solid #3b82f6;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+        }
+        .link-box-label {
+            font-size: 11px;
+            color: #60a5fa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .link-box-value {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+            word-break: break-all;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #1e293b;
+            border-radius: 6px;
+        }
+
+        /* === Toast === */
+        .toast-wrap {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 200;
+        }
+        .toast {
+            padding: 12px 18px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            animation: slideIn 0.2s ease;
+            max-width: 340px;
+        }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #3b82f6; }
+        @keyframes slideIn {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- === Экран авторизации === -->
+    <div class="auth-screen" id="auth-screen">
+        <div class="auth-card">
+            <h1>Cargo Admin</h1>
+            <p>Введите пароль администратора для входа</p>
+            <div class="field">
+                <label>Пароль</label>
+                <input type="password" id="password-input" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="btn-primary" style="width:100%;" id="login-btn">Войти</button>
+        </div>
+    </div>
+
+    <!-- === Основной интерфейс === -->
+    <div id="main-app" style="display:none;">
+        <div class="topbar">
+            <h1>Cargo <span>Admin</span></h1>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-ghost btn-sm" id="refresh-btn">↻ Обновить</button>
+                <button class="btn-ghost btn-sm" id="logout-btn">Выйти</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="grid">
+
+                <!-- === Левая колонка: создание заказа === -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">Новый заказ</div>
+                        <form id="create-form">
+                            <div class="field">
+                                <label>Наименование груза *</label>
+                                <input type="text" name="cargo_name" placeholder="Кока-кола, паллеты" required>
+                            </div>
+
+                            <div class="row-2">
+                                <div class="field">
+                                    <label>Вес, кг *</label>
+                                    <input type="number" name="weight" placeholder="1200" step="0.1" min="0.1" required>
+                                </div>
+                                <div class="field">
+                                    <label>Мест *</label>
+                                    <input type="number" name="places" placeholder="24" step="1" min="1" required>
+                                </div>
+                            </div>
+
+                            <div class="row-3">
+                                <div class="field">
+                                    <label>Длина, см</label>
+                                    <input type="number" name="length" placeholder="120" step="1" min="1">
+                                </div>
+                                <div class="field">
+                                    <label>Ширина, см</label>
+                                    <input type="number" name="width" placeholder="80" step="1" min="1">
+                                </div>
+                                <div class="field">
+                                    <label>Высота, см</label>
+                                    <input type="number" name="height" placeholder="100" step="1" min="1">
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label>Откуда *</label>
+                                <input type="text" name="from" placeholder="Москва, склад №5" required>
+                            </div>
+
+                            <div class="field">
+                                <label>Куда *</label>
+                                <input type="text" name="to" placeholder="СПб, ТК Лента" required>
+                            </div>
+
+                            <div class="field">
+                                <label>Дата отправки *</label>
+                                <input type="date" name="ship_date" required>
+                            </div>
+
+                            <div class="field">
+                                <label>Телефон грузчика *</label>
+                                <input type="tel" name="phone_expected" placeholder="+7 999 123-45-67" required>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="width:100%;" id="create-btn">
+                                Создать заказ
+                            </button>
+                        </form>
+
+                        <div id="link-result"></div>
+                    </div>
+                </div>
+
+                <!-- === Правая колонка: список заказов === -->
+                <div>
+                    <div class="card">
+                        <div class="card-title">Заказы</div>
+
+                        <div class="filters" id="filters">
+                            <button class="filter-chip active" data-status="">Все</button>
+                            <button class="filter-chip" data-status="created">Создан</button>
+                            <button class="filter-chip" data-status="awaiting_phone">Ждём номер</button>
+                            <button class="filter-chip" data-status="awaiting_form">Ждём форму</button>
+                            <button class="filter-chip" data-status="awaiting_docs">Ждём документы</button>
+                            <button class="filter-chip" data-status="completed">Завершён</button>
+                        </div>
+
+                        <div id="orders-list">
+                            <div class="empty-state">Загрузка...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- === Модалка с деталями заказа === -->
+    <div class="modal-backdrop" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Заказ</h2>
+                <button class="modal-close" id="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-actions" id="modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- === Тосты === -->
+    <div class="toast-wrap" id="toasts"></div>
+
+    <script>
+        // ===== Конфигурация =====
+        const API_BASE = ''; // тот же домен
+        const STORAGE_KEY = 'cargo_admin_password';
+
+        let password = localStorage.getItem(STORAGE_KEY) || '';
+        let currentFilter = '';
+        let currentOrders = [];
+
+        // ===== Хелперы =====
+        function $(sel) { return document.querySelector(sel); }
+        function $$(sel) { return document.querySelectorAll(sel); }
+
+        function toast(message, type = 'info') {
+            const el = document.createElement('div');
+            el.className = 'toast ' + type;
+            el.textContent = message;
+            $('#toasts').appendChild(el);
+            setTimeout(() => el.remove(), 3500);
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function api(path, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Admin-Password': password,
+                ...(options.headers || {}),
+            };
+            return fetch(API_BASE + path, { ...options, headers });
+        }
+
+        const STATUS_LABELS = {
+            created: 'Создан',
+            awaiting_phone: 'Ждём номер',
+            awaiting_form: 'Ждём форму',
+            awaiting_docs: 'Ждём документы',
+            completed: 'Завершён',
+            cancelled: 'Отменён',
+        };
+
+        function statusBadge(status) {
+            const label = STATUS_LABELS[status] || status;
+            return `<span class="status status-${status}">${label}</span>`;
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso);
+            return d.toLocaleString('ru-RU', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit',
+            });
+        }
+
+        // ===== Авторизация =====
+        function showAuth() {
+            $('#auth-screen').style.display = 'flex';
+            $('#main-app').style.display = 'none';
+            $('#password-input').focus();
+        }
+
+        function showApp() {
+            $('#auth-screen').style.display = 'none';
+            $('#main-app').style.display = 'block';
+            loadOrders();
+        }
+
+        $('#login-btn').addEventListener('click', async () => {
+            const pwd = $('#password-input').value.trim();
+            if (!pwd) return toast('Введите пароль', 'error');
+
+            password = pwd;
+            const res = await api('/api/orders');
+            if (res.ok) {
+                localStorage.setItem(STORAGE_KEY, pwd);
+                showApp();
+                toast('Добро пожаловать!', 'success');
+            } else {
+                password = '';
+                localStorage.removeItem(STORAGE_KEY);
+                toast('Неверный пароль', 'error');
+            }
+        });
+
+        $('#password-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') $('#login-btn').click();
+        });
+
+        $('#logout-btn').addEventListener('click', () => {
+            password = '';
+            localStorage.removeItem(STORAGE_KEY);
+            showAuth();
+        });
+
+        // ===== Установка дефолтной даты =====
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelector('input[name="ship_date"]').value = today;
+        document.querySelector('input[name="ship_date"]').min = today;
+
+        // ===== Создание заказа =====
+        $('#create-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = $('#create-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Создание...';
+
+            const fd = new FormData(e.target);
+            const payload = {
+                cargo: {
+                    name: fd.get('cargo_name'),
+                    weight: parseFloat(fd.get('weight')),
+                    places: parseInt(fd.get('places'), 10),
+                    length: parseFloat(fd.get('length')) || 0,
+                    width: parseFloat(fd.get('width')) || 0,
+                    height: parseFloat(fd.get('height')) || 0,
+                },
+                route: {
+                    from: fd.get('from'),
+                    to: fd.get('to'),
+                    ship_date: fd.get('ship_date'),
+                },
+                loader: {
+                    phone_expected: fd.get('phone_expected'),
+                },
+            };
+
+            try {
+                const res = await api('/api/orders', {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    toast('Заказ создан: ' + result.order.id, 'success');
+                    e.target.reset();
+                    document.querySelector('input[name="ship_date"]').value = today;
+                    showLinkBox(result);
+                    loadOrders();
+                } else {
+                    const msg = result.details ? result.details.join('; ') : (result.error || 'Ошибка');
+                    toast(msg, 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                toast('Ошибка сети', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Создать заказ';
+            }
+        });
+
+        function showLinkBox(result) {
+            const link = result.loader_link;
+            if (!link) {
+                $('#link-result').innerHTML = `
+                    <div class="link-box">
+                        <div class="link-box-label">Ссылка не сгенерирована</div>
+                        <div style="font-size:12px;color:#f87171;">
+                            Проверь переменную окружения BOT_USERNAME на Vercel
+                        </div>
+                    </div>`;
+                return;
+            }
+            $('#link-result').innerHTML = `
+                <div class="link-box">
+                    <div class="link-box-label">Ссылка для грузчика (${escapeHtml(result.order.id)})</div>
+                    <div class="link-box-value" id="link-value">${escapeHtml(link)}</div>
+                    <button class="btn-primary btn-sm" id="copy-link">Скопировать</button>
+                </div>`;
+
+            $('#copy-link').addEventListener('click', () => {
+                navigator.clipboard.writeText(link).then(
+                    () => toast('Ссылка скопирована', 'success'),
+                    () => toast('Не удалось скопировать', 'error')
+                );
+            });
+        }
+
+        // ===== Список заказов =====
+        async function loadOrders() {
+            if (!password) return;
+            $('#orders-list').innerHTML = '<div class="empty-state">Загрузка...</div>';
+            try {
+                const path = currentFilter
+                    ? `/api/orders?status=${currentFilter}`
+                    : '/api/orders';
+                const res = await api(path);
+                if (res.status === 401) {
+                    showAuth();
+                    return;
+                }
+                const data = await res.json();
+                currentOrders = data.orders || [];
+                renderOrders();
+            } catch (err) {
+                console.error(err);
+                $('#orders-list').innerHTML = '<div class="empty-state">Ошибка загрузки</div>';
+            }
+        }
+
+        function renderOrders() {
+            if (!currentOrders.length) {
+                $('#orders-list').innerHTML =
+                    `<div class="empty-state">Пока нет заказов${currentFilter ? ' в этом статусе' : ''}</div>`;
+                return;
+            }
+
+            $('#orders-list').innerHTML = currentOrders.map(o => `
+                <div class="order-item" data-id="${escapeHtml(o.id)}">
+                    <div class="order-item-header">
+                        <span class="order-id">${escapeHtml(o.id)}</span>
+                        ${statusBadge(o.status)}
+                    </div>
+                    <div class="order-name">${escapeHtml(o.cargo.name || '—')}</div>
+                    <div class="order-route">
+                        ${escapeHtml(o.route.from || '—')} → ${escapeHtml(o.route.to || '—')}
+                    </div>
+                    <div class="order-meta">
+                        <span>⚖️ ${o.cargo.weight} кг</span>
+                        <span>📦 ${o.cargo.places} мест</span>
+                        <span>📅 ${escapeHtml(o.route.ship_date)}</span>
+                        <span>📱 ${escapeHtml(o.loader.phone_expected)}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            $$('.order-item').forEach(el => {
+                el.addEventListener('click', () => openOrder(el.dataset.id));
+            });
+        }
+
+        // ===== Фильтры =====
+        $$('.filter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                $$('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentFilter = chip.dataset.status;
+                loadOrders();
+            });
+        });
+
+        $('#refresh-btn').addEventListener('click', loadOrders);
+
+        // ===== Модалка заказа =====
+        function openOrder(id) {
+            const order = currentOrders.find(o => o.id === id);
+            if (!order) return;
+
+            $('#modal-title').textContent = 'Заказ ' + order.id;
+            $('#modal-body').innerHTML = renderOrderDetail(order);
+            $('#modal-actions').innerHTML = renderOrderActions(order);
+            $('#modal').classList.add('show');
+
+            // Обработчики кнопок действий
+            $$('#modal-actions button[data-action]').forEach(btn => {
+                btn.addEventListener('click', () => handleOrderAction(order, btn.dataset.action));
+            });
+        }
+
+        function renderOrderDetail(o) {
+            const l = o.loader || {};
+            const i = o.inspection;
+
+            let html = `
+                <div class="detail-section">
+                    <h3>Статус</h3>
+                    <div>${statusBadge(o.status)}</div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Груз</h3>
+                    <div class="detail-row"><span class="label">Наименование</span><span class="value">${escapeHtml(o.cargo.name)}</span></div>
+                    <div class="detail-row"><span class="label">Вес</span><span class="value">${o.cargo.weight} кг</span></div>
+                    <div class="detail-row"><span class="label">Мест</span><span class="value">${o.cargo.places}</span></div>
+                    <div class="detail-row"><span class="label">Габариты</span><span class="value">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Маршрут</h3>
+                    <div class="detail-row"><span class="label">Откуда</span><span class="value">${escapeHtml(o.route.from)}</span></div>
+                    <div class="detail-row"><span class="label">Куда</span><span class="value">${escapeHtml(o.route.to)}</span></div>
+                    <div class="detail-row"><span class="label">Дата отправки</span><span class="value">${escapeHtml(o.route.ship_date)}</span></div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Грузчик</h3>
+                    <div class="detail-row"><span class="label">Телефон (ожидается)</span><span class="value">${escapeHtml(l.phone_expected || '—')}</span></div>
+                    <div class="detail-row"><span class="label">Телефон (получен)</span><span class="value">${escapeHtml(l.phone_received || '—')}</span></div>
+                    <div class="detail-row"><span class="label">MAX User ID</span><span class="value">${escapeHtml(l.max_user_id || '—')}</span></div>
+                    <div class="detail-row"><span class="label">Имя</span><span class="value">${escapeHtml((l.first_name || '') + ' ' + (l.last_name || ''))}</span></div>
+                    <div class="detail-row"><span class="label">Username</span><span class="value">${l.username ? '@' + escapeHtml(l.username) : '—'}</span></div>
+                </div>
+            `;
+
+            if (i) {
+                html += `
+                    <div class="detail-section">
+                        <h3>Осмотр груза</h3>
+                        <div class="checklist">
+                            <div class="check-item ${i.check_packaging ? 'yes' : 'no'}">Упаковка целая</div>
+                            <div class="check-item ${i.check_marking ? 'yes' : 'no'}">Маркировка читаемая</div>
+                            <div class="check-item ${i.check_weight_actual ? 'yes' : 'no'}">Вес совпадает</div>
+                            <div class="check-item ${i.check_no_damage ? 'yes' : 'no'}">Повреждения отсутствуют</div>
+                            <div class="check-item ${i.check_no_odor ? 'yes' : 'no'}">Посторонние запахи отсутствуют</div>
+                            <div class="check-item ${i.check_docs ? 'yes' : 'no'}">Документы в наличии</div>
+                        </div>
+                        ${i.comment ? `<div style="margin-top:12px;font-size:13px;color:#cbd5e1;"><strong>Комментарий:</strong> ${escapeHtml(i.comment)}</div>` : ''}
+                        <div class="detail-row" style="margin-top:12px;"><span class="label">Подтверждено</span><span class="value">${formatDate(i.confirmed_at)}</span></div>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="detail-section">
+                    <h3>История</h3>
+                    ${(o.history || []).map(h => `
+                        <div class="detail-row">
+                            <span class="label">${escapeHtml(h.event)}</span>
+                            <span class="value">${formatDate(h.at)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            return html;
+        }
+
+        function renderOrderActions(o) {
+            const actions = [];
+            if (o.status === 'awaiting_docs') {
+                actions.push(`<button class="btn-primary" data-action="complete">Завершить заказ</button>`);
+            }
+            if (o.status !== 'completed' && o.status !== 'cancelled') {
+                actions.push(`<button class="btn-ghost" data-action="cancel">Отменить</button>`);
+            }
+            if (o.loader.phone_expected) {
+                const link = `${location.origin.replace(/\/$/, '')}/?start=${o.id}`;
+                actions.push(`<button class="btn-ghost" data-action="copy-link">Скопировать ссылку</button>`);
+            }
+            actions.push(`<button class="btn-ghost" data-action="close">Закрыть</button>`);
+            return actions.join('');
+        }
+
+        async function handleOrderAction(order, action) {
+            if (action === 'close') {
+                $('#modal').classList.remove('show');
+                return;
+            }
+
+            if (action === 'copy-link') {
+                const botUsername = prompt('Введите username бота (например, my_bot):');
+                if (!botUsername) return;
+                const link = `https://max.ru/${botUsername}?start=${order.id}`;
+                navigator.clipboard.writeText(link).then(() => toast('Ссылка скопирована', 'success'));
+                return;
+            }
+
+            if (action === 'complete') {
+                await patchStatus(order.id, 'completed');
+            } else if (action === 'cancel') {
+                if (!confirm('Отменить заказ?')) return;
+                await patchStatus(order.id, 'cancelled');
+            }
+        }
+
+        async function patchStatus(id, status) {
+            try {
+                const res = await api('/api/order', {
+                    method: 'PATCH',
+                    body: JSON.stringify({ id, status }),
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    toast('Статус обновлён', 'success');
+                    $('#modal').classList.remove('show');
+                    loadOrders();
+                } else {
+                    toast(data.error || 'Ошибка', 'error');
+                }
+            } catch (err) {
+                toast('Ошибка сети', 'error');
+            }
+        }
+
+        $('#modal-close').addEventListener('click', () => $('#modal').classList.remove('show'));
+        $('#modal').addEventListener('click', (e) => {
+            if (e.target === $('#modal')) $('#modal').classList.remove('show');
+        });
+
+        // ===== Автообновление каждые 15 секунд =====
+        setInterval(() => {
+            if (password && !$('#modal').classList.contains('show')) {
+                loadOrders();
+            }
+        }, 15000);
+
+        // ===== Инициализация =====
+        if (password) {
+            api('/api/orders').then(res => {
+                if (res.ok) showApp();
+                else showAuth();
+            }).catch(() => showAuth());
+        } else {
+            showAuth();
+        }
+    </script>
+</body>
+</html>
