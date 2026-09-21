@@ -1,6 +1,7 @@
 {
   "version": 2,
+  "framework": null,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/submit" }
+    { "source": "/api/(.*)", "destination": "/api/submit" }
   ]
 }
