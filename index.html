@@ -564,7 +564,6 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Отправка...';
 
-            // Собираем данные формы
             const formData = {};
             form.querySelectorAll('input, textarea, select').forEach(input => {
                 if (input.type === 'checkbox') {
@@ -587,19 +586,30 @@
                 });
 
                 const result = await response.json();
+                console.log('Server response:', result);
 
                 if (response.ok && result.success) {
-                    showToast('Груз принят на проверку', 'success');
+                    if (result.notification_sent) {
+                        showToast('Готово! Бот прислал подтверждение в чат', 'success');
+                    } else {
+                        showToast('Данные приняты, но уведомление не доставлено', 'error');
+                        console.warn('Notification error:', result.notification_error);
+                    }
+
+                    // НЕ закрываем сразу — даём пользователю увидеть тост
                     setTimeout(() => {
                         if (webApp && webApp.close) webApp.close();
-                    }, 1500);
+                    }, 2500);
                 } else {
-                    showToast(result.error || 'Ошибка отправки', 'error');
+                    const msg = result.details
+                        ? result.details.join('; ')
+                        : (result.error || 'Ошибка отправки');
+                    showToast(msg, 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Отправить на проверку';
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Fetch error:', err);
                 showToast('Ошибка сети. Попробуйте снова', 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Отправить на проверку';
