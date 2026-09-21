@@ -1,0 +1,14 @@
+{
+  "name": "max-mini-app",
+  "version": "1.0.0",
+  "description": "Мини-приложение для MAX",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "body-parser": "^1.20.2",
+    "max-validate-init-data": "^1.0.0"
+  }
+}
