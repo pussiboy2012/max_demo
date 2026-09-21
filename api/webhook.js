@@ -88,13 +88,37 @@ async function sendFormButton(userId, orderId) {
  */
 function extractContact(message) {
     const attachments = message?.body?.attachments || [];
+
+    // DEBUG: покажем все вложения целиком
+    console.log('ALL ATTACHMENTS:', JSON.stringify(attachments, null, 2));
+
     const contactAttachment = attachments.find((a) => a.type === 'contact');
-    if (!contactAttachment) return null;
+    if (!contactAttachment) {
+        console.log('No contact attachment found');
+        return null;
+    }
+
+    // DEBUG: покажем только контакт
+    console.log('CONTACT ATTACHMENT:', JSON.stringify(contactAttachment, null, 2));
 
     const payload = contactAttachment.payload || {};
+
+    // Пробуем все возможные поля, где может лежать номер
+    const rawPhone =
+        payload.vcf_phone ||
+        payload.phone ||
+        payload.phone_number ||
+        payload.contact_phone ||
+        payload.tel ||
+        '';
+
+    console.log('Extracted raw phone:', JSON.stringify(rawPhone));
+    console.log('All payload keys:', Object.keys(payload));
+
     return {
-        phone: normalizePhone(payload.vcf_phone || payload.phone || ''),
+        phone: normalizePhone(rawPhone),
         vcf_info: payload.vcf_info || null,
+        raw_payload: payload, // на случай если понадобится ещё что-то
     };
 }
 
