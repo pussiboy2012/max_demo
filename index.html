@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя форма в MAX</title>
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input, button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Привет, <span id="user-name">гость</span>!</h2>
+    <form id="my-form">
+        <input type="text" name="name" placeholder="Ваше имя" required>
+        <input type="email" name="email" placeholder="Ваш Email" required>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <script>
+        // Получаем данные пользователя из MAX Bridge
+        const webApp = window.WebApp;
+        if (webApp && webApp.initDataUnsafe && webApp.initDataUnsafe.user) {
+            document.getElementById('user-name').textContent = webApp.initDataUnsafe.user.first_name;
+        }
+
+        // Обработка отправки формы
+        document.getElementById('my-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            // Отправляем данные и строку initData на наш бэкенд для проверки и сохранения
+            const response = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    formData: data,
+                    initData: webApp.initData // Важно: именно initData (строка), а не initDataUnsafe
+                })
+            });
+
+            if (response.ok) {
+                alert('Данные успешно отправлены!');
+                // Можно использовать webApp.close() чтобы закрыть мини-приложение
+                webApp.close();
+            } else {
+                alert('Произошла ошибка при отправке.');
+            }
+        });
+    </script>
+</body>
+</html>
