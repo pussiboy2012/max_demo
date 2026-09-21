@@ -122,7 +122,7 @@ async function sendBotMessage(userId, text, botToken) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${botToken}`,
+                Authorization: botToken,
             },
             body: JSON.stringify({ text, format: 'markdown' }),
         });
