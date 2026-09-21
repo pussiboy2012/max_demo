@@ -59,6 +59,23 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
         }
+
+        /* === Поле телефона === */
+        #phone-input {
+            letter-spacing: 0.5px;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 15px;
+        }
+        #phone-input.valid {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+        }
+        #phone-input.invalid {
+            border-color: #ef4444;
+        }
+
+        
         input::placeholder, textarea::placeholder { color: #475569; }
 
         label {
@@ -495,8 +512,17 @@
                             </div>
 
                             <div class="field">
-                                <label>Телефон грузчика *</label>
-                                <input type="tel" name="phone_expected" placeholder="+7 999 123-45-67" required>
+                                <label>Телефон водителя *</label>
+                                <input
+                                    type="tel"
+                                    name="phone_expected"
+                                    id="phone-input"
+                                    placeholder="+7 (___) ___-__-__"
+                                    inputmode="tel"
+                                    autocomplete="off"
+                                    maxlength="18"
+                                    required
+                                >
                             </div>
 
                             <button type="submit" class="btn-primary" style="width:100%;" id="create-btn">
@@ -654,6 +680,81 @@
         document.querySelector('input[name="ship_date"]').value = today;
         document.querySelector('input[name="ship_date"]').min = today;
 
+        // ===== Маска для телефона =====
+        const phoneInput = document.getElementById('phone-input');
+        
+        /**
+         * Форматирует ввод пользователя в +7 (XXX) XXX-XX-XX.
+         * Всё, что не цифра — игнорируется. Первая 8 или 7 превращается в +7.
+         * Возвращает отформатированную строку.
+         */
+        function formatPhone(raw) {
+            // Оставляем только цифры
+            let digits = String(raw).replace(/\D/g, '');
+        
+            // Если начинается с 8 или 7 — отбрасываем первую цифру (это код страны)
+            if (digits.startsWith('8') || digits.startsWith('7')) {
+                digits = digits.slice(1);
+            }
+        
+            // Ограничиваем 10 цифрами (остальное — код страны)
+            digits = digits.slice(0, 10);
+        
+            // Собираем строку по маске
+            let result = '+7';
+            if (digits.length > 0) result += ' (' + digits.slice(0, 3);
+            if (digits.length >= 3) result += ') ' + digits.slice(3, 6);
+            if (digits.length >= 6) result += '-' + digits.slice(6, 8);
+            if (digits.length >= 8) result += '-' + digits.slice(8, 10);
+        
+            return result;
+        }
+        
+        /**
+         * Проверяет, что введён полный номер (10 цифр после +7).
+         */
+        function isPhoneComplete(raw) {
+            const digits = String(raw).replace(/\D/g, '');
+            return digits.length === 11; // 7 + 10 цифр
+        }
+        
+        // Автоформатирование при вводе
+        phoneInput.addEventListener('input', (e) => {
+            const cursorAtEnd = e.target.selectionStart === e.target.value.length;
+        
+            const formatted = formatPhone(e.target.value);
+            e.target.value = formatted;
+        
+            // Ставим курсор в конец, если он там и был
+            if (cursorAtEnd) {
+                e.target.setSelectionRange(formatted.length, formatted.length);
+            }
+        
+            // Подсветка валидности
+            e.target.classList.remove('valid', 'invalid');
+            if (formatted === '+7') return; // ещё ничего не введено
+            if (isPhoneComplete(formatted)) {
+                e.target.classList.add('valid');
+            } else if (formatted.length > 4) {
+                e.target.classList.add('invalid');
+            }
+        });
+        
+        // Поддержка вставки из буфера — форматируем сразу
+        phoneInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            phoneInput.value = formatPhone(text);
+            phoneInput.dispatchEvent(new Event('input'));
+        });
+        
+        // Убираем подсветку при потере фокуса, если номер неполный
+        phoneInput.addEventListener('blur', () => {
+            if (!isPhoneComplete(phoneInput.value)) {
+                phoneInput.classList.remove('valid', 'invalid');
+            }
+        });
+
         // ===== Создание заказа =====
         $('#create-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -677,7 +778,7 @@
                     ship_date: fd.get('ship_date'),
                 },
                 loader: {
-                    phone_expected: fd.get('phone_expected'),
+                    phone_expected: fd.get('phone_expected').replace(/\D/g, ''), // только цифры
                 },
             };
 
