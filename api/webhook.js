@@ -84,41 +84,45 @@ async function sendFormButton(userId, orderId) {
 }
 
 /**
- * Извлекает контакт из сообщения.
+ * Парсит vCard-строку и достаёт из неё номер телефона.
+ * Пример vcf_info:
+ *   "BEGIN:VCARD\r\nVERSION:3.0\r\nPRODID:ez-vcard 0.10.3\r\nTEL;TYPE=cell:79086010130\r\nFN:Роман Герасимов\r\nEND:VCARD\r\n"
  */
+function parsePhoneFromVcard(vcfInfo) {
+    if (!vcfInfo) return '';
+
+    // Ищем строку с TEL. Варианты: "TEL:...", "TEL;TYPE=cell:...", "TEL;TYPE=VOICE:..."
+    const match = vcfInfo.match(/^TEL[^:]*:(.+)$/m);
+    if (!match) return '';
+
+    return normalizePhone(match[1].trim());
+}
+
 function extractContact(message) {
     const attachments = message?.body?.attachments || [];
-
-    // DEBUG: покажем все вложения целиком
-    console.log('ALL ATTACHMENTS:', JSON.stringify(attachments, null, 2));
-
     const contactAttachment = attachments.find((a) => a.type === 'contact');
-    if (!contactAttachment) {
-        console.log('No contact attachment found');
-        return null;
-    }
-
-    // DEBUG: покажем только контакт
-    console.log('CONTACT ATTACHMENT:', JSON.stringify(contactAttachment, null, 2));
+    if (!contactAttachment) return null;
 
     const payload = contactAttachment.payload || {};
+    const maxInfo = payload.max_info || {};
 
-    // Пробуем все возможные поля, где может лежать номер
-    const rawPhone =
-        payload.vcf_phone ||
-        payload.phone ||
-        payload.phone_number ||
-        payload.contact_phone ||
-        payload.tel ||
-        '';
-
-    console.log('Extracted raw phone:', JSON.stringify(rawPhone));
-    console.log('All payload keys:', Object.keys(payload));
+    // Приоритет 1: отдельное поле vcf_phone (если MAX когда-нибудь добавит)
+    // Приоритет 2: парсим vCard из vcf_info
+    let phone = '';
+    if (payload.vcf_phone) {
+        phone = normalizePhone(payload.vcf_phone);
+    } else if (payload.vcf_info) {
+        phone = parsePhoneFromVcard(payload.vcf_info);
+    }
 
     return {
-        phone: normalizePhone(rawPhone),
+        phone,
         vcf_info: payload.vcf_info || null,
-        raw_payload: payload, // на случай если понадобится ещё что-то
+        // MAX присылает данные пользователя в max_info — используем их для имени/username
+        first_name: maxInfo.first_name || null,
+        last_name: maxInfo.last_name || null,
+        username: maxInfo.username || null,
+        max_user_id: maxInfo.user_id || null,
     };
 }
 
