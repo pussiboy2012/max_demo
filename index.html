@@ -3,14 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Проверка груза перед отправкой</title>
+    <title>Осмотр груза</title>
     <script src="https://st.max.ru/js/max-web-app.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -18,35 +14,21 @@
             color: #1a1a1a;
             font-size: 15px;
             line-height: 1.5;
-            padding: 16px 12px 90px;
+            padding: 16px 12px 100px;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 560px;
-            margin: 0 auto;
-        }
+        .container { max-width: 560px; margin: 0 auto; }
 
         .header {
-            background: #ffffff;
+            background: #fff;
             border-radius: 14px;
             padding: 20px;
             margin-bottom: 14px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-
-        .header h1 {
-            font-size: 19px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .header p {
-            font-size: 13px;
-            color: #64748b;
-        }
-
+        .header h1 { font-size: 19px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+        .header p { font-size: 13px; color: #64748b; }
         .user-badge {
             display: inline-flex;
             align-items: center;
@@ -61,7 +43,7 @@
         }
 
         .section {
-            background: #ffffff;
+            background: #fff;
             border-radius: 14px;
             padding: 20px;
             margin-bottom: 14px;
@@ -79,7 +61,6 @@
             align-items: center;
             gap: 8px;
         }
-
         .section-title::before {
             content: '';
             width: 3px;
@@ -88,103 +69,36 @@
             border-radius: 2px;
         }
 
-        .field {
-            margin-bottom: 16px;
-        }
-
-        .field:last-child {
-            margin-bottom: 0;
-        }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 6px;
-        }
-
-        .field label .required {
-            color: #dc2626;
-            margin-left: 2px;
-        }
-
-        .field input[type="text"],
-        .field input[type="number"],
-        .field input[type="date"],
-        .field select,
-        .field textarea {
-            width: 100%;
-            padding: 11px 13px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 9px;
-            font-size: 15px;
-            font-family: inherit;
-            color: #0f172a;
-            background: #ffffff;
-            transition: border-color 0.15s, box-shadow 0.15s;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        .field textarea {
-            resize: vertical;
-            min-height: 72px;
-        }
-
-        .field input:focus,
-        .field select:focus,
-        .field textarea:focus {
-            outline: none;
-            border-color: #1d4ed8;
-            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
-        }
-
-        .field input.error,
-        .field select.error,
-        .field textarea.error {
-            border-color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .field .error-text {
-            display: none;
-            font-size: 12px;
-            color: #dc2626;
-            margin-top: 4px;
-        }
-
-        .field.has-error .error-text {
-            display: block;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
             gap: 12px;
         }
-
-        .checkbox-list {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: #64748b; flex-shrink: 0; }
+        .info-row .value {
+            color: #0f172a;
+            font-weight: 500;
+            text-align: right;
+            word-break: break-word;
         }
+
+        .checkbox-list { display: flex; flex-direction: column; gap: 4px; }
 
         .checkbox-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            padding: 10px 12px;
+            padding: 11px 12px;
             border-radius: 9px;
             cursor: pointer;
             transition: background 0.15s;
             user-select: none;
         }
-
-        .checkbox-item:hover {
-            background: #f8fafc;
-        }
-
+        .checkbox-item:hover { background: #f8fafc; }
         .checkbox-item input[type="checkbox"] {
             appearance: none;
             -webkit-appearance: none;
@@ -198,12 +112,10 @@
             position: relative;
             transition: all 0.15s;
         }
-
         .checkbox-item input[type="checkbox"]:checked {
             background: #1d4ed8;
             border-color: #1d4ed8;
         }
-
         .checkbox-item input[type="checkbox"]:checked::after {
             content: '';
             position: absolute;
@@ -215,16 +127,8 @@
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
         }
-
-        .checkbox-item span {
-            font-size: 14px;
-            color: #334155;
-            line-height: 1.4;
-        }
-
-        .checkbox-item.error {
-            background: #fef2f2;
-        }
+        .checkbox-item span { font-size: 14px; color: #334155; line-height: 1.4; }
+        .checkbox-item.error { background: #fef2f2; }
 
         .warning-box {
             background: #fffbeb;
@@ -236,23 +140,36 @@
             margin-bottom: 16px;
         }
 
+        .field textarea {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #0f172a;
+            background: #fff;
+            resize: vertical;
+            min-height: 72px;
+        }
+        .field textarea:focus {
+            outline: none;
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+        }
+
         .submit-btn {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             padding: 14px 16px 18px;
             background: linear-gradient(to top, #f4f6f8 60%, transparent);
         }
-
         .submit-btn button {
-            width: 100%;
-            max-width: 560px;
-            margin: 0 auto;
-            display: block;
+            width: 100%; max-width: 560px;
+            margin: 0 auto; display: block;
             padding: 15px;
             background: #1d4ed8;
-            color: white;
+            color: #fff;
             border: none;
             border-radius: 11px;
             font-size: 16px;
@@ -261,27 +178,16 @@
             cursor: pointer;
             transition: background 0.15s, transform 0.1s;
         }
-
-        .submit-btn button:hover {
-            background: #1e40af;
-        }
-
-        .submit-btn button:active {
-            transform: scale(0.99);
-        }
-
-        .submit-btn button:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
+        .submit-btn button:hover { background: #1e40af; }
+        .submit-btn button:active { transform: scale(0.99); }
+        .submit-btn button:disabled { background: #94a3b8; cursor: not-allowed; }
 
         .toast {
             position: fixed;
-            top: 20px;
-            left: 50%;
+            top: 20px; left: 50%;
             transform: translateX(-50%) translateY(-100px);
             background: #0f172a;
-            color: white;
+            color: #fff;
             padding: 12px 20px;
             border-radius: 10px;
             font-size: 14px;
@@ -291,330 +197,274 @@
             max-width: 90%;
             text-align: center;
         }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
 
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
+        .loader-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            color: #64748b;
+            gap: 16px;
         }
+        .loader-spinner .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #1d4ed8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .toast.success {
-            background: #16a34a;
+        .error-screen {
+            background: #fff;
+            border-radius: 14px;
+            padding: 32px 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-
-        .toast.error {
-            background: #dc2626;
-        }
-
-        @media (max-width: 380px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-        }
+        .error-screen .icon { font-size: 40px; margin-bottom: 12px; }
+        .error-screen h2 { font-size: 17px; color: #0f172a; margin-bottom: 8px; }
+        .error-screen p { font-size: 14px; color: #64748b; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Проверка груза перед отправкой</h1>
-            <p>Заполните все обязательные поля и подтвердите осмотр</p>
-            <div class="user-badge">
-                <span id="user-name">Загрузка...</span>
-            </div>
+
+    <div class="container" id="app">
+        <div class="loader-spinner">
+            <div class="spinner"></div>
+            <div>Загрузка данных заказа...</div>
         </div>
-
-        <form id="cargo-form" novalidate>
-            <!-- Блок 1: Данные груза -->
-            <div class="section">
-                <div class="section-title">Данные груза</div>
-
-                <div class="field">
-                    <label>Наименование груза <span class="required">*</span></label>
-                    <input type="text" name="cargo_name" placeholder="Например: Бытовая техника" required>
-                    <div class="error-text">Укажите наименование груза</div>
-                </div>
-
-                <div class="row">
-                    <div class="field">
-                        <label>Вес, кг <span class="required">*</span></label>
-                        <input type="number" name="weight" placeholder="0.0" step="0.1" min="0.1" required>
-                        <div class="error-text">Укажите корректный вес</div>
-                    </div>
-                    <div class="field">
-                        <label>Мест, шт <span class="required">*</span></label>
-                        <input type="number" name="places" placeholder="0" step="1" min="1" required>
-                        <div class="error-text">Укажите количество мест</div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="field">
-                        <label>Длина, см <span class="required">*</span></label>
-                        <input type="number" name="length" placeholder="0" step="1" min="1" required>
-                        <div class="error-text">Укажите длину</div>
-                    </div>
-                    <div class="field">
-                        <label>Ширина, см <span class="required">*</span></label>
-                        <input type="number" name="width" placeholder="0" step="1" min="1" required>
-                        <div class="error-text">Укажите ширину</div>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>Высота, см <span class="required">*</span></label>
-                    <input type="number" name="height" placeholder="0" step="1" min="1" required>
-                    <div class="error-text">Укажите высоту</div>
-                </div>
-            </div>
-
-            <!-- Блок 2: Маршрут -->
-            <div class="section">
-                <div class="section-title">Маршрут</div>
-
-                <div class="field">
-                    <label>Пункт отправления <span class="required">*</span></label>
-                    <input type="text" name="from" placeholder="Город, адрес" required>
-                    <div class="error-text">Укажите пункт отправления</div>
-                </div>
-
-                <div class="field">
-                    <label>Пункт назначения <span class="required">*</span></label>
-                    <input type="text" name="to" placeholder="Город, адрес" required>
-                    <div class="error-text">Укажите пункт назначения</div>
-                </div>
-
-                <div class="field">
-                    <label>Дата отправки <span class="required">*</span></label>
-                    <input type="date" name="ship_date" required>
-                    <div class="error-text">Выберите дату отправки</div>
-                </div>
-            </div>
-
-            <!-- Блок 3: Чек-лист осмотра -->
-            <div class="section">
-                <div class="section-title">Чек-лист осмотра</div>
-
-                <div class="warning-box">
-                    Отметьте все пункты, которые соответствуют фактическому состоянию груза. Все пункты обязательны.
-                </div>
-
-                <div class="checkbox-list" id="checklist">
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_packaging" required>
-                        <span>Упаковка целая, без повреждений</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_marking" required>
-                        <span>Маркировка читаемая и соответствует документам</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_weight_actual" required>
-                        <span>Фактический вес совпадает с заявленным</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_no_damage" required>
-                        <span>Видимые повреждения отсутствуют</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_no_odor" required>
-                        <span>Посторонние запахи отсутствуют</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="check_docs" required>
-                        <span>Сопроводительные документы в наличии</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Блок 4: Примечание -->
-            <div class="section">
-                <div class="section-title">Примечание</div>
-                <div class="field">
-                    <label>Комментарий к осмотру</label>
-                    <textarea name="comment" placeholder="Если есть особенности — опишите здесь"></textarea>
-                </div>
-            </div>
-
-            <!-- Блок 5: Подтверждение -->
-            <div class="section">
-                <div class="section-title">Подтверждение</div>
-                <label class="checkbox-item" id="confirm-item">
-                    <input type="checkbox" name="confirm" required>
-                    <span>Подтверждаю, что данные достоверны, груз осмотрен лично</span>
-                </label>
-            </div>
-        </form>
-    </div>
-
-    <div class="submit-btn">
-        <button type="submit" form="cargo-form" id="submit-btn">Отправить на проверку</button>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
         const webApp = window.WebApp;
-        const form = document.getElementById('cargo-form');
-        const submitBtn = document.getElementById('submit-btn');
+        const appRoot = document.getElementById('app');
         const toast = document.getElementById('toast');
 
-        // Показываем имя пользователя
-        if (webApp && webApp.initDataUnsafe && webApp.initDataUnsafe.user) {
+        let orderData = null;
+
+        // ===== Имя пользователя =====
+        let userName = 'Водитель';
+        if (webApp?.initDataUnsafe?.user) {
             const u = webApp.initDataUnsafe.user;
-            document.getElementById('user-name').textContent =
-                (u.first_name || '') + (u.last_name ? ' ' + u.last_name : '');
-        } else {
-            document.getElementById('user-name').textContent = 'Гость';
+            userName = (u.first_name || '') + (u.last_name ? ' ' + u.last_name : '');
         }
 
-        // Устанавливаем сегодняшнюю дату по умолчанию
-        const today = new Date().toISOString().split('T')[0];
-        form.ship_date.value = today;
-        form.ship_date.min = today;
-
-        // Функция показа тоста
-        function showToast(message, type = '') {
-            toast.textContent = message;
+        // ===== Toast =====
+        function showToast(msg, type = '') {
+            toast.textContent = msg;
             toast.className = 'toast show ' + type;
             setTimeout(() => { toast.className = 'toast ' + type; }, 3000);
         }
 
-        // Валидация одного поля
-        function validateField(input) {
-            const field = input.closest('.field') || input.closest('.checkbox-item');
-            if (!field) return true;
-
-            let valid = true;
-
-            if (input.type === 'checkbox') {
-                if (input.required && !input.checked) valid = false;
-                field.classList.toggle('error', !valid);
-                return valid;
-            }
-
-            const value = input.value.trim();
-            if (input.required && !value) {
-                valid = false;
-            } else if (input.type === 'number' && value) {
-                const num = parseFloat(value);
-                const min = input.min ? parseFloat(input.min) : -Infinity;
-                if (isNaN(num) || num < min) valid = false;
-            }
-
-            field.classList.toggle('has-error', !valid);
-            input.classList.toggle('error', !valid);
-            return valid;
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
         }
 
-        // Валидация всей формы
-        function validateForm() {
-            let valid = true;
-            let firstError = null;
-
-            // Текстовые, числовые, дата
-            form.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
-                if (!validateField(input)) {
-                    valid = false;
-                    if (!firstError) firstError = input;
-                }
-            });
-
-            // Чекбоксы чек-листа
-            const checkboxes = form.querySelectorAll('#checklist input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                if (!validateField(cb)) {
-                    valid = false;
-                    if (!firstError) firstError = cb;
-                }
-            });
-
-            // Подтверждение
-            const confirm = form.querySelector('input[name="confirm"]');
-            if (!validateField(confirm)) {
-                valid = false;
-                if (!firstError) firstError = confirm;
-            }
-
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            return valid;
-        }
-
-        // Слушаем изменения полей — убираем ошибку при вводе
-        form.querySelectorAll('input, select, textarea').forEach(input => {
-            const event = input.type === 'checkbox' ? 'change' : 'input';
-            input.addEventListener(event, () => {
-                const field = input.closest('.field') || input.closest('.checkbox-item');
-                if (field) {
-                    field.classList.remove('has-error', 'error');
-                    input.classList.remove('error');
-                }
-            });
-        });
-
-        // Отправка
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!validateForm()) {
-                showToast('Заполните все обязательные поля', 'error');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Отправка...';
-
-            const formData = {};
-            form.querySelectorAll('input, textarea, select').forEach(input => {
-                if (input.type === 'checkbox') {
-                    formData[input.name] = input.checked;
-                } else if (input.type === 'number') {
-                    formData[input.name] = parseFloat(input.value);
-                } else {
-                    formData[input.name] = input.value.trim();
-                }
-            });
-
+        // ===== Загрузка заказа =====
+        async function loadOrder() {
             try {
-                const response = await fetch('/api/submit', {
+                const res = await fetch('/api/my-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        formData,
-                        initData: webApp ? webApp.initData : null
-                    })
+                    body: JSON.stringify({ initData: webApp ? webApp.initData : null }),
                 });
 
-                const result = await response.json();
-                console.log('Server response:', result);
+                const data = await res.json();
 
-                if (response.ok && result.success) {
-                    if (result.notification_sent) {
-                        showToast('Готово! Бот прислал подтверждение в чат', 'success');
-                    } else {
-                        showToast('Данные приняты, но уведомление не доставлено', 'error');
-                        console.warn('Notification error:', result.notification_error);
-                    }
-
-                    // НЕ закрываем сразу — даём пользователю увидеть тост
-                    setTimeout(() => {
-                        if (webApp && webApp.close) webApp.close();
-                    }, 2500);
-                } else {
-                    const msg = result.details
-                        ? result.details.join('; ')
-                        : (result.error || 'Ошибка отправки');
-                    showToast(msg, 'error');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Отправить на проверку';
+                if (!res.ok || !data.success) {
+                    showError(data.error || 'Заказ не найден');
+                    return;
                 }
+
+                orderData = data.order;
+                renderForm();
             } catch (err) {
-                console.error('Fetch error:', err);
-                showToast('Ошибка сети. Попробуйте снова', 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Отправить на проверку';
+                console.error(err);
+                showError('Ошибка сети. Попробуйте открыть форму заново.');
             }
-        });
+        }
+
+        function showError(message) {
+            appRoot.innerHTML = `
+                <div class="error-screen">
+                    <div class="icon">⚠️</div>
+                    <h2>Заказ недоступен</h2>
+                    <p>${escapeHtml(message)}</p>
+                </div>
+            `;
+        }
+
+        // ===== Рендер формы =====
+        function renderForm() {
+            const o = orderData;
+            const c = o.cargo;
+            const r = o.route;
+
+            appRoot.innerHTML = `
+                <div class="header">
+                    <h1>Осмотр груза</h1>
+                    <p>Заказ <strong>${escapeHtml(o.id)}</strong></p>
+                    <div class="user-badge">${escapeHtml(userName)}</div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Данные груза</div>
+                    <div class="info-row"><span class="label">Наименование</span><span class="value">${escapeHtml(c.name)}</span></div>
+                    <div class="info-row"><span class="label">Вес</span><span class="value">${c.weight} кг</span></div>
+                    <div class="info-row"><span class="label">Мест</span><span class="value">${c.places}</span></div>
+                    <div class="info-row"><span class="label">Габариты</span><span class="value">${c.length} × ${c.width} × ${c.height} см</span></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Маршрут</div>
+                    <div class="info-row"><span class="label">Откуда</span><span class="value">${escapeHtml(r.from)}</span></div>
+                    <div class="info-row"><span class="label">Куда</span><span class="value">${escapeHtml(r.to)}</span></div>
+                    <div class="info-row"><span class="label">Дата отправки</span><span class="value">${escapeHtml(r.ship_date)}</span></div>
+                </div>
+
+                <form id="inspection-form" novalidate>
+                    <div class="section">
+                        <div class="section-title">Чек-лист осмотра</div>
+                        <div class="warning-box">
+                            Отметьте все пункты, которые соответствуют фактическому состоянию груза.
+                        </div>
+                        <div class="checkbox-list" id="checklist">
+                            <label class="checkbox-item"><input type="checkbox" name="check_packaging" required><span>Упаковка целая, без повреждений</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="check_marking" required><span>Маркировка читаемая и соответствует документам</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="check_weight_actual" required><span>Фактический вес совпадает с заявленным</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="check_no_damage" required><span>Видимые повреждения отсутствуют</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="check_no_odor" required><span>Посторонние запахи отсутствуют</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="check_docs" required><span>Сопроводительные документы в наличии</span></label>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Примечание</div>
+                        <div class="field">
+                            <textarea name="comment" placeholder="Если есть особенности — опишите здесь"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">Подтверждение</div>
+                        <label class="checkbox-item" id="confirm-item">
+                            <input type="checkbox" name="confirm" required>
+                            <span>Подтверждаю, что данные достоверны, груз осмотрен лично</span>
+                        </label>
+                    </div>
+                </form>
+            `;
+
+            attachFormHandlers();
+        }
+
+        // ===== Обработчики формы =====
+        function attachFormHandlers() {
+            const form = document.getElementById('inspection-form');
+            const submitBtn = document.createElement('div');
+            submitBtn.className = 'submit-btn';
+            submitBtn.innerHTML = '<button type="submit" form="inspection-form" id="submit-btn">Отправить осмотр</button>';
+            document.body.appendChild(submitBtn);
+
+            // Убираем подсветку ошибок при вводе
+            form.querySelectorAll('input, textarea').forEach(input => {
+                const event = input.type === 'checkbox' ? 'change' : 'input';
+                input.addEventListener(event, () => {
+                    const field = input.closest('.checkbox-item');
+                    if (field) field.classList.remove('error');
+                });
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Проверка чек-листа
+                let firstError = null;
+                form.querySelectorAll('#checklist input[type="checkbox"]').forEach(cb => {
+                    const item = cb.closest('.checkbox-item');
+                    if (cb.required && !cb.checked) {
+                        item.classList.add('error');
+                        if (!firstError) firstError = item;
+                    } else {
+                        item.classList.remove('error');
+                    }
+                });
+
+                const confirmCb = form.querySelector('input[name="confirm"]');
+                if (!confirmCb.checked) {
+                    confirmCb.closest('.checkbox-item').classList.add('error');
+                    if (!firstError) firstError = confirmCb.closest('.checkbox-item');
+                } else {
+                    confirmCb.closest('.checkbox-item').classList.remove('error');
+                }
+
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    showToast('Отметьте все пункты чек-листа', 'error');
+                    return;
+                }
+
+                // Собираем данные
+                const formData = {};
+                form.querySelectorAll('input, textarea').forEach(input => {
+                    if (input.type === 'checkbox') {
+                        formData[input.name] = input.checked;
+                    } else {
+                        formData[input.name] = input.value.trim();
+                    }
+                });
+
+                const btn = document.getElementById('submit-btn');
+                btn.disabled = true;
+                btn.textContent = 'Отправка...';
+
+                try {
+                    const res = await fetch('/api/submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            formData,
+                            initData: webApp ? webApp.initData : null,
+                        }),
+                    });
+
+                    const result = await res.json();
+
+                    if (res.ok && result.success) {
+                        showToast('Осмотр принят! Проверьте чат с ботом', 'success');
+                        setTimeout(() => {
+                            if (webApp && webApp.close) webApp.close();
+                        }, 2500);
+                    } else {
+                        const msg = result.details ? result.details.join('; ') : (result.error || 'Ошибка');
+                        showToast(msg, 'error');
+                        btn.disabled = false;
+                        btn.textContent = 'Отправить осмотр';
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Ошибка сети. Попробуйте снова', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Отправить осмотр';
+                }
+            });
+        }
+
+        // ===== Запуск =====
+        loadOrder();
     </script>
 </body>
 </html>
