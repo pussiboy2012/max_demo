@@ -110,7 +110,6 @@ function validateCargoForm(formData) {
 
 /**
  * Отправляет сообщение в чат от имени бота.
- * @returns {{ ok: boolean, error?: string }}
  */
 async function sendBotMessage(userId, text, botToken) {
     if (!botToken) return { ok: false, error: 'Не задан MAX_BOT_TOKEN' };
@@ -125,10 +124,7 @@ async function sendBotMessage(userId, text, botToken) {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${botToken}`,
             },
-            body: JSON.stringify({
-                text,
-                format: 'markdown',
-            }),
+            body: JSON.stringify({ text, format: 'markdown' }),
         });
 
         const responseText = await response.text();
@@ -192,14 +188,8 @@ function buildNotificationText(user, userData, formData) {
     return lines.join('\n');
 }
 
-export default async function handler(request) {
-    if (request.method !== 'POST') {
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-            status: 405,
-            headers: { 'Content-Type': 'application/json' },
-        });
-    }
-
+// 👇 ВОТ ЭТА СТРОКА ИЗМЕНИЛАСЬ
+export async function POST(request) {
     let body;
     try {
         body = await request.json();
