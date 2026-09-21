@@ -2,7 +2,5 @@
   "name": "max-mini-app-vercel",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "max-validate-init-data": "^0.0.3"
-  }
+  "type": "module"
 }
