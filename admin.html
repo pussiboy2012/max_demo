@@ -6,760 +6,707 @@
     <title>Cargo Admin</title>
     <style>
         :root {
-            --bg: #0b1120;
-            --bg-elevated: #111827;
-            --bg-card: #1a2234;
-            --bg-hover: #232d42;
-            --border: #2a3446;
-            --border-light: #334155;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --purple: #a855f7;
+            --bg: #fafafa;
+            --bg-card: #ffffff;
+            --bg-hover: #f5f5f5;
+            --bg-subtle: #f9fafb;
+            --border: #eaeaea;
+            --border-strong: #d4d4d4;
+            --text: #171717;
+            --text-muted: #737373;
+            --text-dim: #a3a3a3;
+            --accent: #171717;
+            --accent-hover: #000000;
+            --blue: #2563eb;
+            --green: #059669;
+            --yellow: #d97706;
+            --red: #dc2626;
+            --purple: #7c3aed;
+            --radius: 10px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             font-size: 14px;
             line-height: 1.5;
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
         }
 
-        /* ============ ЛОГИН ============ */
-        .auth-screen {
+        /* ============ LOGIN ============ */
+        .login-screen {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            padding: 20px;
-            background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.15), transparent 60%);
+            padding: 24px;
         }
-        .auth-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 36px 32px;
+        .login-card {
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            max-width: 380px;
         }
-        .auth-logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--accent), var(--purple));
+        .login-logo {
+            width: 44px;
+            height: 44px;
+            background: var(--accent);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 28px;
+            color: #fff;
         }
-        .auth-card h1 { font-size: 22px; color: #fff; margin-bottom: 6px; }
-        .auth-card > p { color: var(--text-muted); margin-bottom: 26px; font-size: 13px; }
+        .login-card h1 {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .login-card > p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        .login-form { display: flex; flex-direction: column; gap: 16px; }
 
-        /* ============ ОБЩИЕ ЭЛЕМЕНТЫ ============ */
+        /* ============ FORM ELEMENTS ============ */
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        label .req { color: var(--red); margin-left: 2px; }
+
         input, select, textarea {
             width: 100%;
-            padding: 11px 13px;
-            border: 1.5px solid var(--border-light);
-            background: var(--bg);
+            padding: 10px 12px;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-card);
             color: var(--text);
-            border-radius: 9px;
+            border-radius: var(--radius-sm);
             font-size: 14px;
             font-family: inherit;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
+        input:hover, select:hover, textarea:hover { border-color: #b8b8b8; }
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+            box-shadow: 0 0 0 3px rgba(23,23,23,0.08);
         }
         input::placeholder, textarea::placeholder { color: var(--text-dim); }
+        input:disabled { background: var(--bg-subtle); color: var(--text-dim); cursor: not-allowed; }
 
-        label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            font-weight: 600;
-        }
-
-        button {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 600;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 14px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 500;
             font-family: inherit;
             cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
+            transition: all 0.15s;
+            white-space: nowrap;
+            line-height: 1.2;
         }
-        button:active { transform: scale(0.98); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
         .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text);
+            border-color: var(--border-strong);
+        }
+        .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); }
+
         .btn-ghost {
             background: transparent;
             color: var(--text-muted);
-            border: 1.5px solid var(--border-light);
+            border-color: transparent;
         }
-        .btn-ghost:hover { background: var(--bg-hover); color: var(--text); }
-        .btn-sm { padding: 7px 12px; font-size: 12px; }
-        .btn-danger { background: var(--danger); color: #fff; }
-        .btn-danger:hover { background: #dc2626; }
+        .btn-ghost:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
 
-        .field { margin-bottom: 16px; }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-        /* ============ APP LAYOUT ============ */
-        .app {
-            display: flex;
-            min-height: 100vh;
+        .btn-danger {
+            background: var(--bg-card);
+            color: var(--red);
+            border-color: var(--border-strong);
         }
+        .btn-danger:hover:not(:disabled) { background: #fef2f2; border-color: #fecaca; }
+
+        .btn-sm { padding: 6px 10px; font-size: 13px; }
+        .btn-block { width: 100%; }
+
+        /* ============ APP ============ */
+        .app { display: flex; min-height: 100vh; }
 
         /* ============ SIDEBAR ============ */
         .sidebar {
-            width: 250px;
-            background: var(--bg-elevated);
+            width: 240px;
+            background: var(--bg-subtle);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 50;
-        }
-        .brand {
-            padding: 20px 22px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        .brand-logo {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent), var(--purple));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-        .brand-text h1 {
-            font-size: 15px;
-            color: #fff;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        .brand-text span {
-            font-size: 11px;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+            top: 0; left: 0; bottom: 0;
+            z-index: 40;
         }
 
-        .nav {
+        .sidebar-brand {
+            padding: 20px 18px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-mark {
+            width: 28px; height: 28px;
+            background: var(--accent);
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .brand-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .sidebar-nav {
             flex: 1;
-            padding: 16px 12px;
+            padding: 4px 10px;
             overflow-y: auto;
         }
-        .nav-section {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+        .nav-group {
+            padding: 16px 8px 6px;
+            font-size: 11px;
+            font-weight: 600;
             color: var(--text-dim);
-            font-weight: 700;
-            padding: 12px 12px 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
         }
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 11px 12px;
-            border-radius: 9px;
+            gap: 10px;
+            padding: 7px 10px;
+            border-radius: var(--radius-sm);
             color: var(--text-muted);
+            font-size: 13.5px;
+            font-weight: 500;
             cursor: pointer;
             user-select: none;
-            transition: all 0.15s;
-            margin-bottom: 2px;
-            font-weight: 500;
-            position: relative;
+            transition: background 0.1s, color 0.1s;
+            margin-bottom: 1px;
         }
-        .nav-item:hover {
-            background: var(--bg-hover);
-            color: var(--text);
-        }
+        .nav-item:hover { background: var(--bg-hover); color: var(--text); }
         .nav-item.active {
-            background: rgba(59,130,246,0.12);
-            color: #fff;
+            background: var(--bg-card);
+            color: var(--text);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            padding: 6px 9px;
         }
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 3px;
-            height: 20px;
-            background: var(--accent);
-            border-radius: 0 3px 3px 0;
-        }
-        .nav-icon {
-            width: 20px;
-            text-align: center;
-            font-size: 16px;
+        .nav-item .icon {
+            width: 16px; height: 16px;
             flex-shrink: 0;
+            color: currentColor;
         }
         .nav-badge {
             margin-left: auto;
-            background: var(--accent);
-            color: #fff;
             font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            background: var(--bg-hover);
             padding: 1px 7px;
-            border-radius: 10px;
-            font-weight: 700;
+            border-radius: 20px;
             min-width: 20px;
             text-align: center;
         }
-        .nav-badge.muted { background: var(--bg-hover); color: var(--text-muted); }
+        .nav-item.active .nav-badge {
+            background: var(--bg);
+            color: var(--text-muted);
+        }
 
         .sidebar-footer {
-            padding: 14px;
+            padding: 12px 10px;
             border-top: 1px solid var(--border);
         }
-        .user-card {
+        .user-menu {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 8px 10px;
-            border-radius: 9px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            margin-bottom: 8px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.1s;
         }
+        .user-menu:hover { background: var(--bg-hover); }
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent), var(--purple));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 700;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            background: var(--accent);
             color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
             flex-shrink: 0;
         }
-        .user-info {
-            overflow: hidden;
-        }
-        .user-info strong {
+        .user-meta { flex: 1; min-width: 0; }
+        .user-meta strong {
             display: block;
             font-size: 13px;
+            font-weight: 500;
             color: var(--text);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            line-height: 1.3;
         }
-        .user-info span {
-            font-size: 11px;
+        .user-meta span {
+            font-size: 11.5px;
             color: var(--text-dim);
+            line-height: 1.3;
         }
 
-        /* ============ MAIN CONTENT ============ */
+        /* ============ MAIN ============ */
         .main {
             flex: 1;
-            margin-left: 250px;
+            margin-left: 240px;
             min-width: 0;
             display: flex;
             flex-direction: column;
         }
 
-        .page-header {
-            padding: 22px 32px;
+        .topbar {
+            padding: 14px 32px;
             border-bottom: 1px solid var(--border);
-            background: var(--bg-elevated);
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
             position: sticky;
             top: 0;
             z-index: 30;
+        }
+        .topbar-left {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+            gap: 14px;
+            min-width: 0;
         }
-        .page-header h2 {
-            font-size: 20px;
-            color: #fff;
-            font-weight: 700;
+        .topbar h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
         }
-        .page-header p {
-            font-size: 12px;
-            color: var(--text-dim);
-            margin-top: 2px;
-        }
-        .page-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
+        .topbar-actions { display: flex; gap: 8px; flex-shrink: 0; }
 
-        .page-content {
+        .page {
             flex: 1;
-            padding: 28px 32px 60px;
+            padding: 32px;
+            max-width: 1280px;
+            width: 100%;
         }
-
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
+        .page-view { display: none; }
+        .page-view.active { display: block; animation: fadeUp 0.2s ease; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ============ CARDS ============ */
+        .page-header {
+            margin-bottom: 28px;
+        }
+        .page-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* ============ CARD ============ */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 22px;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
         }
-        .card-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 18px;
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 12px;
         }
-        .card-title::before {
-            content: '';
-            width: 3px;
-            height: 14px;
-            background: var(--accent);
-            border-radius: 2px;
+        .card-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
         }
-        .card-title .card-subtitle {
-            margin-left: auto;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-dim);
+        .card-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
-        /* ============ DASHBOARD ============ */
+        /* ============ FORM GRID ============ */
+        .form-grid {
+            display: grid;
+            gap: 18px;
+        }
+        .form-row { display: grid; gap: 14px; }
+        .form-row-2 { grid-template-columns: 1fr 1fr; }
+        .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+        @media (max-width: 640px) {
+            .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+        }
+        .form-field { display: flex; flex-direction: column; }
+
+        /* ============ DASHBOARD STATS ============ */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
             margin-bottom: 24px;
         }
-        .stat-card {
+        @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 640px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+        .stat {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: var(--radius);
             padding: 18px;
-            position: relative;
-            overflow: hidden;
-            transition: border-color 0.15s, transform 0.15s;
             cursor: pointer;
+            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
         }
-        .stat-card:hover {
-            border-color: var(--border-light);
-            transform: translateY(-2px);
+        .stat:hover {
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-sm);
         }
         .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-dim);
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat-label .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
         }
         .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #fff;
-            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
             line-height: 1;
         }
-        .stat-icon {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 22px;
-            opacity: 0.3;
-        }
-        .stat-accent-blue .stat-value { color: #60a5fa; }
-        .stat-accent-warning .stat-value { color: #fbbf24; }
-        .stat-accent-purple .stat-value { color: #c084fc; }
-        .stat-accent-green .stat-value { color: #4ade80; }
+        .dot-gray { background: #a3a3a3; }
+        .dot-yellow { background: var(--yellow); }
+        .dot-blue { background: var(--blue); }
+        .dot-purple { background: var(--purple); }
+        .dot-green { background: var(--green); }
 
-        .dashboard-grid {
+        /* ============ DASHBOARD GRID ============ */
+        .dash-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: 1fr 340px;
             gap: 20px;
         }
-        @media (max-width: 1100px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1000px) { .dash-grid { grid-template-columns: 1fr; } }
 
-        .quick-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .quick-action {
+        /* ============ RECENT ORDERS ============ */
+        .recent-list { display: flex; flex-direction: column; }
+        .recent-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
             cursor: pointer;
-            transition: all 0.15s;
-            text-align: left;
-            width: 100%;
-            font-size: 13px;
+            transition: padding 0.15s;
+        }
+        .recent-item:last-child { border-bottom: none; }
+        .recent-item:hover { padding-left: 4px; }
+        .recent-item:hover .recent-name { color: var(--blue); }
+
+        .recent-icon {
+            width: 36px; height: 36px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+        .recent-body { flex: 1; min-width: 0; }
+        .recent-name {
             font-weight: 500;
+            color: var(--text);
+            font-size: 13.5px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.15s;
         }
-        .quick-action:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent);
-            transform: translateX(2px);
+        .recent-route {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .quick-action-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
+        .recent-id {
+            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+            font-size: 11.5px;
+            color: var(--text-dim);
             flex-shrink: 0;
         }
-        .qa-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
-        .qa-purple { background: rgba(168,85,247,0.15); color: #c084fc; }
-        .qa-green { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .qa-orange { background: rgba(245,158,11,0.15); color: #fbbf24; }
 
-        /* ============ ORDERS LIST ============ */
-        .orders-toolbar {
+        /* ============ QUICK ACTIONS ============ */
+        .qa-list { display: flex; flex-direction: column; gap: 2px; }
+        .qa-item {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
             align-items: center;
-        }
-        .filter-chip {
-            padding: 7px 14px;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
             background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border-light);
-            border-radius: 20px;
-            font-size: 12px;
+            border: none;
             cursor: pointer;
-            transition: all 0.15s;
-            font-weight: 600;
+            font-family: inherit;
+            color: var(--text);
+            font-size: 13.5px;
+            font-weight: 500;
+            text-align: left;
+            width: 100%;
+            transition: background 0.1s;
         }
-        .filter-chip:hover { border-color: #475569; color: var(--text); }
-        .filter-chip.active {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
+        .qa-item:hover { background: var(--bg-hover); }
+        .qa-icon {
+            width: 30px; height: 30px;
+            border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            flex-shrink: 0;
+            border: 1px solid var(--border);
         }
+        .qa-item:hover .qa-icon { background: var(--bg-card); }
 
-        .orders-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 14px;
-        }
-        .order-card {
+        /* ============ ORDERS ============ */
+        .filters {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding: 4px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
+            border-radius: var(--radius-sm);
+            width: fit-content;
+            max-width: 100%;
         }
-        .order-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(59,130,246,0.1);
-        }
-        .order-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            gap: 10px;
-        }
-        .order-id {
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        .order-name {
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 6px;
-            font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .order-route {
-            font-size: 12px;
+        .filter {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
             color: var(--text-muted);
-            margin-bottom: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.12s;
             white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
-        .order-meta {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            font-size: 11px;
-            color: var(--text-dim);
-            padding-top: 10px;
-            border-top: 1px solid var(--border);
-        }
-        .order-meta span {
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        .filter:hover { color: var(--text); }
+        .filter.active {
+            background: var(--bg-hover);
+            color: var(--text);
+            box-shadow: var(--shadow-sm);
         }
 
-        /* ============ STATUS BADGES ============ */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .order-row {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .order-row:hover {
+            border-color: var(--border-strong);
+            box-shadow: var(--shadow-sm);
+        }
+        .order-row-main { min-width: 0; }
+        .order-row-name {
+            font-weight: 500;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .order-row-route {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .order-row-id {
+            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+            font-size: 11.5px;
+            color: var(--text-dim);
+        }
+        .order-row-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .order-row-meta span { display: flex; align-items: center; gap: 4px; }
+
+        @media (max-width: 900px) {
+            .order-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .order-row-meta {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+
+        /* ============ STATUS ============ */
         .status {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
+            gap: 6px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            font-weight: 500;
             white-space: nowrap;
+            border: 1px solid;
+            line-height: 1.4;
         }
-        .status::before {
-            content: '';
-            width: 6px;
-            height: 6px;
+        .status .sdot {
+            width: 6px; height: 6px;
             border-radius: 50%;
         }
-        .status-created { background: rgba(148,163,184,0.15); color: #cbd5e1; }
-        .status-created::before { background: #94a3b8; }
-        .status-awaiting_phone { background: rgba(245,158,11,0.15); color: #fbbf24; }
-        .status-awaiting_phone::before { background: #f59e0b; }
-        .status-awaiting_form { background: rgba(59,130,246,0.15); color: #60a5fa; }
-        .status-awaiting_form::before { background: #3b82f6; }
-        .status-awaiting_docs { background: rgba(168,85,247,0.15); color: #c084fc; }
-        .status-awaiting_docs::before { background: #a855f7; }
-        .status-completed { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .status-completed::before { background: #22c55e; }
-        .status-cancelled { background: rgba(239,68,68,0.15); color: #f87171; }
-        .status-cancelled::before { background: #ef4444; }
+        .status-created { background: #fafafa; color: #525252; border-color: #e5e5e5; }
+        .status-created .sdot { background: #a3a3a3; }
+        .status-awaiting_phone { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+        .status-awaiting_phone .sdot { background: #f59e0b; }
+        .status-awaiting_form { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+        .status-awaiting_form .sdot { background: #3b82f6; }
+        .status-awaiting_docs { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
+        .status-awaiting_docs .sdot { background: #8b5cf6; }
+        .status-completed { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+        .status-completed .sdot { background: #10b981; }
+        .status-cancelled { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+        .status-cancelled .sdot { background: #ef4444; }
 
-        /* ============ ДОКУМЕНТЫ ============ */
-        .docs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-            margin-bottom: 24px;
-        }
-        .doc-type-card {
-            background: var(--bg-card);
+        /* ============ LINK BOX ============ */
+        .link-box {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            cursor: pointer;
-            transition: all 0.15s;
-            opacity: 0.85;
+            border-radius: var(--radius);
         }
-        .doc-type-card:hover {
-            border-color: var(--border-light);
-            transform: translateY(-2px);
-            opacity: 1;
-        }
-        .doc-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        .doc-info h4 {
-            font-size: 14px;
-            color: #fff;
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-        .doc-info p {
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        .doc-count {
-            margin-left: auto;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dim);
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-
-        .docs-table-wrap {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .docs-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        .docs-table th {
-            text-align: left;
-            padding: 14px 18px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: var(--text-dim);
-            font-weight: 700;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-elevated);
-        }
-        .docs-table td {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-        }
-        .docs-table tr:last-child td { border-bottom: none; }
-        .docs-table tr:hover td { background: var(--bg-hover); }
-        .doc-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        .doc-status.uploaded { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .doc-status.pending { background: rgba(245,158,11,0.15); color: #fbbf24; }
-        .doc-status.missing { background: rgba(239,68,68,0.15); color: #f87171; }
-
-        /* ============ НАСТРОЙКИ ============ */
-        .settings-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        @media (max-width: 1000px) {
-            .settings-layout { grid-template-columns: 1fr; }
-        }
-
-        .settings-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-            gap: 16px;
-        }
-        .settings-row:last-child { border-bottom: none; }
-        .settings-row-info h4 {
-            font-size: 13px;
-            color: var(--text);
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-        .settings-row-info p {
+        .link-box-label {
             font-size: 12px;
-            color: var(--text-dim);
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .link-box-value {
+            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+            font-size: 12.5px;
+            color: var(--text);
+            word-break: break-all;
+            padding: 10px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
         }
 
-        .switch {
-            position: relative;
-            width: 42px;
-            height: 24px;
-            flex-shrink: 0;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .switch-slider {
-            position: absolute;
-            inset: 0;
-            background: var(--border-light);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .switch-slider::before {
-            content: '';
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            left: 3px;
-            top: 3px;
-            background: #fff;
-            border-radius: 50%;
-            transition: transform 0.2s;
-        }
-        .switch input:checked + .switch-slider { background: var(--accent); }
-        .switch input:checked + .switch-slider::before { transform: translateX(18px); }
-
-        .danger-zone {
-            border-color: rgba(239,68,68,0.3) !important;
-        }
-        .danger-zone .card-title::before { background: var(--danger); }
-
-        /* ============ МОДАЛКА ============ */
+        /* ============ MODAL ============ */
         .modal-backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(4px);
+            background: rgba(15,15,15,0.4);
+            backdrop-filter: blur(2px);
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
             z-index: 100;
         }
         .modal-backdrop.show { display: flex; }
         .modal {
             background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: 16px;
-            max-width: 720px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            max-width: 640px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            box-shadow: var(--shadow-lg);
         }
         .modal-header {
             padding: 20px 24px;
@@ -772,143 +719,184 @@
             background: var(--bg-card);
             z-index: 1;
         }
-        .modal-header h2 { font-size: 16px; color: #fff; }
+        .modal-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+        .modal-header .id {
+            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 400;
+            margin-left: 8px;
+        }
         .modal-close {
             background: transparent;
             border: none;
             color: var(--text-muted);
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            padding: 0 6px;
+            padding: 4px 8px;
             line-height: 1;
+            border-radius: 6px;
+            transition: background 0.1s;
         }
-        .modal-close:hover { color: #fff; }
+        .modal-close:hover { background: var(--bg-hover); color: var(--text); }
         .modal-body { padding: 24px; }
         .modal-actions {
             padding: 16px 24px;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: flex-end;
             flex-wrap: wrap;
-            position: sticky;
-            bottom: 0;
-            background: var(--bg-card);
+            background: var(--bg-subtle);
+            border-radius: 0 0 14px 14px;
         }
 
-        .detail-section { margin-bottom: 22px; }
-        .detail-section:last-child { margin-bottom: 0; }
-        .detail-section h3 {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-dim);
+        .detail-block { margin-bottom: 24px; }
+        .detail-block:last-child { margin-bottom: 0; }
+        .detail-block h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
             margin-bottom: 10px;
-            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
-        .detail-row {
+        .detail-list { display: flex; flex-direction: column; gap: 0; }
+        .detail-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 9px 0;
+            font-size: 13.5px;
+            gap: 16px;
             border-bottom: 1px solid var(--border);
-            font-size: 13px;
-            gap: 12px;
         }
-        .detail-row:last-child { border-bottom: none; }
-        .detail-row .label { color: var(--text-muted); flex-shrink: 0; }
-        .detail-row .value {
+        .detail-item:last-child { border-bottom: none; }
+        .detail-item .k { color: var(--text-muted); flex-shrink: 0; }
+        .detail-item .v {
             color: var(--text);
-            font-weight: 500;
             text-align: right;
             word-break: break-word;
             min-width: 0;
+            font-weight: 500;
         }
 
-        .checklist { display: grid; gap: 8px; }
-        .check-item {
+        .check-list { display: flex; flex-direction: column; gap: 8px; }
+        .check-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 13px;
-            color: var(--text-muted);
-            padding: 6px 0;
+            font-size: 13.5px;
+            color: var(--text);
         }
-        .check-item.yes { color: var(--text); }
-        .check-item.yes::before { content: '✓'; color: #4ade80; font-weight: 700; font-size: 15px; }
-        .check-item.no::before { content: '✕'; color: #f87171; font-weight: 700; font-size: 15px; }
-
-        /* ============ LINK BOX ============ */
-        .link-box {
-            background: var(--bg);
-            border: 1.5px solid var(--accent);
-            border-radius: 10px;
-            padding: 14px;
-            margin-top: 14px;
-        }
-        .link-box-label {
+        .check-row .cicon {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: #fff;
             font-size: 11px;
-            color: #60a5fa;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
             font-weight: 700;
         }
-        .link-box-value {
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 12px;
-            color: var(--text);
-            word-break: break-all;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: var(--bg-elevated);
-            border-radius: 6px;
+        .check-row.yes .cicon { background: var(--green); }
+        .check-row.no .cicon { background: var(--red); }
+        .check-row.no { color: var(--text-muted); }
+
+        .comment-box {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            color: var(--text);
+            line-height: 1.55;
+        }
+        .comment-box .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
         }
 
-        /* ============ TOAST ============ */
-        .toast-wrap {
+        /* ============ PLACEHOLDER PAGES ============ */
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .placeholder-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+        }
+        .placeholder h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .placeholder p {
+            font-size: 13.5px;
+            max-width: 380px;
+            line-height: 1.55;
+        }
+
+        /* ============ TOASTS ============ */
+        .toasts {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 24px;
+            right: 24px;
             display: flex;
             flex-direction: column;
             gap: 8px;
             z-index: 200;
         }
         .toast {
-            padding: 12px 18px;
-            border-radius: 10px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--text);
             color: #fff;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 500;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            animation: slideIn 0.2s ease;
+            box-shadow: var(--shadow-lg);
+            animation: toastIn 0.2s ease;
             max-width: 340px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .toast.success { background: #16a34a; }
-        .toast.error { background: #dc2626; }
-        .toast.info { background: var(--accent); }
-        @keyframes slideIn {
-            from { transform: translateX(120%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        .toast.success { background: #065f46; }
+        .toast.error { background: #991b1b; }
+        @keyframes toastIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .empty-state {
+        /* ============ MISC ============ */
+        .empty {
             text-align: center;
             padding: 60px 20px;
-            color: var(--text-dim);
-            font-size: 13px;
+            color: var(--text-muted);
+            font-size: 13.5px;
         }
-        .empty-state-icon {
-            font-size: 40px;
-            margin-bottom: 12px;
-            opacity: 0.4;
-        }
-
         .spinner {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 12px; height: 12px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: #fff;
             border-radius: 50%;
@@ -916,273 +904,296 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ============ PHONE ============ */
         #phone-input {
-            letter-spacing: 0.5px;
+            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+            letter-spacing: 0.02em;
             font-variant-numeric: tabular-nums;
-            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-            font-size: 15px;
         }
-        #phone-input.valid {
-            border-color: var(--success);
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
-        }
-        #phone-input.invalid { border-color: var(--danger); }
+        #phone-input.valid { border-color: var(--green); }
+        #phone-input.valid:focus { box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
+        #phone-input.invalid { border-color: var(--red); }
 
-        /* ============ ADAPTIVE ============ */
-        .sidebar-toggle {
+        .mobile-toggle {
             display: none;
             background: transparent;
             border: none;
             color: var(--text);
-            font-size: 22px;
             cursor: pointer;
-            padding: 4px 10px;
+            padding: 4px;
         }
         @media (max-width: 900px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.2s;
-            }
+            .sidebar { transform: translateX(-100%); transition: transform 0.2s; }
             .sidebar.open { transform: translateX(0); }
             .main { margin-left: 0; }
-            .sidebar-toggle { display: block; }
-            .page-content, .page-header { padding-left: 20px; padding-right: 20px; }
-            .row-3 { grid-template-columns: 1fr; }
+            .mobile-toggle { display: flex; }
+            .topbar { padding-left: 16px; padding-right: 16px; }
+            .page { padding: 20px 16px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============ ЭКРАН ЛОГИНА ============ -->
-    <div class="auth-screen" id="auth-screen">
-        <div class="auth-card">
-            <div class="auth-logo">📦</div>
-            <h1>Cargo Admin</h1>
-            <p>Введите пароль администратора для входа</p>
-            <div class="field">
-                <label>Пароль</label>
-                <input type="password" id="password-input" placeholder="••••••••" autocomplete="current-password">
+    <!-- ============ LOGIN ============ -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16.5 9.4 7.55 4.24"/>
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.29 7 12 12 20.71 7"/>
+                    <line x1="12" y1="22" x2="12" y2="12"/>
+                </svg>
             </div>
-            <button class="btn-primary" style="width:100%;" id="login-btn">Войти</button>
+            <h1>Вход в систему</h1>
+            <p>Введите пароль администратора</p>
+            <div class="login-form">
+                <div>
+                    <label for="password-input">Пароль</label>
+                    <input type="password" id="password-input" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <button class="btn btn-primary btn-block" id="login-btn" style="padding:11px;">Войти</button>
+            </div>
         </div>
     </div>
 
-    <!-- ============ ОСНОВНОЕ ПРИЛОЖЕНИЕ ============ -->
-    <div class="app" id="main-app" style="display:none;">
+    <!-- ============ APP ============ -->
+    <div class="app" id="app" style="display:none;">
 
         <!-- === SIDEBAR === -->
         <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <div class="brand-logo">📦</div>
-                <div class="brand-text">
-                    <h1>Cargo Admin</h1>
-                    <span>Логистика v1.0</span>
+            <div class="sidebar-brand">
+                <div class="brand-mark">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16.5 9.4 7.55 4.24"/>
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                        <polyline points="3.29 7 12 12 20.71 7"/>
+                        <line x1="12" y1="22" x2="12" y2="12"/>
+                    </svg>
                 </div>
+                <div class="brand-name">Cargo</div>
             </div>
 
-            <nav class="nav">
-                <div class="nav-section">Основное</div>
+            <nav class="sidebar-nav">
+                <div class="nav-group">Основное</div>
                 <div class="nav-item active" data-page="dashboard">
-                    <span class="nav-icon">🏠</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
                     <span>Главная</span>
                 </div>
                 <div class="nav-item" data-page="create">
-                    <span class="nav-icon">➕</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     <span>Создать заказ</span>
                 </div>
                 <div class="nav-item" data-page="orders">
-                    <span class="nav-icon">📦</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
                     <span>Заказы</span>
-                    <span class="nav-badge" id="orders-count-badge">0</span>
+                    <span class="nav-badge" id="orders-badge">0</span>
                 </div>
 
-                <div class="nav-section">Документооборот</div>
+                <div class="nav-group">Документы</div>
                 <div class="nav-item" data-page="docs">
-                    <span class="nav-icon">📄</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                     <span>Документы</span>
-                    <span class="nav-badge muted" id="docs-count-badge">0</span>
                 </div>
                 <div class="nav-item" data-page="archive">
-                    <span class="nav-icon">🗂️</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
                     <span>Архив</span>
                 </div>
 
-                <div class="nav-section">Система</div>
+                <div class="nav-group">Система</div>
                 <div class="nav-item" data-page="settings">
-                    <span class="nav-icon">⚙️</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     <span>Настройки</span>
                 </div>
             </nav>
 
             <div class="sidebar-footer">
-                <div class="user-card">
+                <div class="user-menu" id="logout-btn" title="Выйти">
                     <div class="user-avatar">A</div>
-                    <div class="user-info">
+                    <div class="user-meta">
                         <strong>Администратор</strong>
                         <span>Диспетчер</span>
                     </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-dim);"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 </div>
-                <button class="btn-ghost btn-sm" style="width:100%;" id="logout-btn">
-                    Выйти из системы
-                </button>
             </div>
         </aside>
 
         <!-- === MAIN === -->
         <main class="main">
-            <header class="page-header">
-                <div style="display:flex; align-items:center; gap:12px; min-width:0;">
-                    <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
-                    <div style="min-width:0;">
-                        <h2 id="page-title">Главная</h2>
-                        <p id="page-subtitle">Обзор текущей ситуации</p>
-                    </div>
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-toggle" id="mobile-toggle">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <h1 id="topbar-title">Главная</h1>
                 </div>
-                <div class="page-actions">
-                    <button class="btn-ghost btn-sm" id="refresh-btn">↻ Обновить</button>
+                <div class="topbar-actions">
+                    <button class="btn btn-ghost btn-sm" id="refresh-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        Обновить
+                    </button>
                 </div>
             </header>
 
-            <div class="page-content">
+            <div class="page">
 
-                <!-- ============ PAGE: DASHBOARD ============ -->
-                <section class="page active" data-page-content="dashboard">
+                <!-- ============ DASHBOARD ============ -->
+                <section class="page-view active" data-view="dashboard">
+                    <div class="page-header">
+                        <h2>Обзор</h2>
+                        <p>Сводка по текущим заказам и активности</p>
+                    </div>
+
                     <div class="stats-grid">
-                        <div class="stat-card" data-goto-status="">
-                            <div class="stat-label">Всего заказов</div>
+                        <div class="stat" data-goto-status="">
+                            <div class="stat-label">Всего <span class="dot dot-gray"></span></div>
                             <div class="stat-value" id="stat-total">0</div>
-                            <div class="stat-icon">📊</div>
                         </div>
-                        <div class="stat-card stat-accent-warning" data-goto-status="awaiting_phone">
-                            <div class="stat-label">Ждут номер</div>
-                            <div class="stat-value" id="stat-awaiting-phone">0</div>
-                            <div class="stat-icon">📱</div>
+                        <div class="stat" data-goto-status="awaiting_phone">
+                            <div class="stat-label">Ждут номер <span class="dot dot-yellow"></span></div>
+                            <div class="stat-value" id="stat-phone">0</div>
                         </div>
-                        <div class="stat-card stat-accent-blue" data-goto-status="awaiting_form">
-                            <div class="stat-label">Ждут форму</div>
-                            <div class="stat-value" id="stat-awaiting-form">0</div>
-                            <div class="stat-icon">📝</div>
+                        <div class="stat" data-goto-status="awaiting_form">
+                            <div class="stat-label">Ждут форму <span class="dot dot-blue"></span></div>
+                            <div class="stat-value" id="stat-form">0</div>
                         </div>
-                        <div class="stat-card stat-accent-purple" data-goto-status="awaiting_docs">
-                            <div class="stat-label">Ждут документы</div>
-                            <div class="stat-value" id="stat-awaiting-docs">0</div>
-                            <div class="stat-icon">📄</div>
+                        <div class="stat" data-goto-status="awaiting_docs">
+                            <div class="stat-label">Ждут док-ты <span class="dot dot-purple"></span></div>
+                            <div class="stat-value" id="stat-docs">0</div>
                         </div>
-                        <div class="stat-card stat-accent-green" data-goto-status="completed">
-                            <div class="stat-label">Завершено</div>
-                            <div class="stat-value" id="stat-completed">0</div>
-                            <div class="stat-icon">✅</div>
+                        <div class="stat" data-goto-status="completed">
+                            <div class="stat-label">Завершено <span class="dot dot-green"></span></div>
+                            <div class="stat-value" id="stat-done">0</div>
                         </div>
                     </div>
 
-                    <div class="dashboard-grid">
+                    <div class="dash-grid">
                         <div class="card">
-                            <div class="card-title">
-                                Последние заказы
-                                <span class="card-subtitle" id="recent-subtitle">—</span>
-                            </div>
-                            <div id="recent-orders">
-                                <div class="empty-state">
-                                    <div class="empty-state-icon">📦</div>
-                                    Пока нет заказов
+                            <div class="card-header">
+                                <div>
+                                    <h3>Последние заказы</h3>
+                                    <p>Пять самых свежих</p>
                                 </div>
+                                <button class="btn btn-ghost btn-sm" data-goto="orders">Все →</button>
                             </div>
+                            <div id="recent-list" class="recent-list"></div>
                         </div>
 
                         <div class="card">
-                            <div class="card-title">Быстрые действия</div>
-                            <div class="quick-actions">
-                                <button class="quick-action" data-goto="create">
-                                    <div class="quick-action-icon qa-blue">➕</div>
-                                    Создать новый заказ
+                            <div class="card-header">
+                                <div>
+                                    <h3>Быстрые действия</h3>
+                                    <p>Часто используемое</p>
+                                </div>
+                            </div>
+                            <div class="qa-list">
+                                <button class="qa-item" data-goto="create">
+                                    <div class="qa-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    </div>
+                                    Создать заказ
                                 </button>
-                                <button class="quick-action" data-goto="orders">
-                                    <div class="quick-action-icon qa-purple">📦</div>
+                                <button class="qa-item" data-goto="orders">
+                                    <div class="qa-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                    </div>
                                     Все заказы
                                 </button>
-                                <button class="quick-action" data-goto="docs">
-                                    <div class="quick-action-icon qa-green">📄</div>
+                                <button class="qa-item" data-goto="docs">
+                                    <div class="qa-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    </div>
                                     Документы
                                 </button>
-                                <button class="quick-action" data-goto="settings">
-                                    <div class="quick-action-icon qa-orange">⚙️</div>
-                                    Настройки системы
+                                <button class="qa-item" data-goto="settings">
+                                    <div class="qa-icon">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                    </div>
+                                    Настройки
                                 </button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- ============ PAGE: CREATE ============ -->
-                <section class="page" data-page-content="create">
-                    <div style="max-width:640px;">
+                <!-- ============ CREATE ============ -->
+                <section class="page-view" data-view="create">
+                    <div class="page-header">
+                        <h2>Новый заказ</h2>
+                        <p>Заполните данные — система сформирует ссылку для водителя</p>
+                    </div>
+
+                    <div style="max-width:720px;">
                         <div class="card">
-                            <div class="card-title">Новый заказ на перевозку</div>
-                            <form id="create-form">
-                                <div class="field">
-                                    <label>Наименование груза *</label>
-                                    <input type="text" name="cargo_name" placeholder="Например: Кока-кола, паллеты" required>
+                            <form id="create-form" class="form-grid">
+                                <div class="form-field">
+                                    <label>Наименование груза <span class="req">*</span></label>
+                                    <input type="text" name="cargo_name" placeholder="Например: Coca-Cola, паллеты" required>
                                 </div>
 
-                                <div class="row-2">
-                                    <div class="field">
-                                        <label>Вес, кг *</label>
+                                <div class="form-row form-row-2">
+                                    <div class="form-field">
+                                        <label>Вес, кг <span class="req">*</span></label>
                                         <input type="number" name="weight" placeholder="1200" step="0.1" min="0.1" required>
                                     </div>
-                                    <div class="field">
-                                        <label>Мест, шт *</label>
+                                    <div class="form-field">
+                                        <label>Мест, шт <span class="req">*</span></label>
                                         <input type="number" name="places" placeholder="24" step="1" min="1" required>
                                     </div>
                                 </div>
 
-                                <div class="row-3">
-                                    <div class="field">
+                                <div class="form-row form-row-3">
+                                    <div class="form-field">
                                         <label>Длина, см</label>
                                         <input type="number" name="length" placeholder="120" step="1" min="1">
                                     </div>
-                                    <div class="field">
+                                    <div class="form-field">
                                         <label>Ширина, см</label>
                                         <input type="number" name="width" placeholder="80" step="1" min="1">
                                     </div>
-                                    <div class="field">
+                                    <div class="form-field">
                                         <label>Высота, см</label>
                                         <input type="number" name="height" placeholder="100" step="1" min="1">
                                     </div>
                                 </div>
 
-                                <div class="field">
-                                    <label>Пункт отправления *</label>
-                                    <input type="text" name="from" placeholder="Москва, склад №5" required>
+                                <div class="form-row form-row-2">
+                                    <div class="form-field">
+                                        <label>Откуда <span class="req">*</span></label>
+                                        <input type="text" name="from" placeholder="Москва, склад №5" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Куда <span class="req">*</span></label>
+                                        <input type="text" name="to" placeholder="СПб, ТК Лента" required>
+                                    </div>
                                 </div>
 
-                                <div class="field">
-                                    <label>Пункт назначения *</label>
-                                    <input type="text" name="to" placeholder="СПб, ТК Лента" required>
+                                <div class="form-row form-row-2">
+                                    <div class="form-field">
+                                        <label>Дата отправки <span class="req">*</span></label>
+                                        <input type="date" name="ship_date" required>
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Телефон водителя <span class="req">*</span></label>
+                                        <input
+                                            type="tel"
+                                            name="phone_expected"
+                                            id="phone-input"
+                                            placeholder="+7 (___) ___-__-__"
+                                            inputmode="tel"
+                                            autocomplete="off"
+                                            maxlength="18"
+                                            required
+                                        >
+                                    </div>
                                 </div>
 
-                                <div class="field">
-                                    <label>Дата отправки *</label>
-                                    <input type="date" name="ship_date" required>
+                                <div style="display:flex; gap:8px; margin-top:4px;">
+                                    <button type="submit" class="btn btn-primary" id="create-btn">
+                                        Создать заказ
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="create-reset">Очистить</button>
                                 </div>
-
-                                <div class="field">
-                                    <label>Телефон водителя *</label>
-                                    <input
-                                        type="tel"
-                                        name="phone_expected"
-                                        id="phone-input"
-                                        placeholder="+7 (___) ___-__-__"
-                                        inputmode="tel"
-                                        autocomplete="off"
-                                        maxlength="18"
-                                        required
-                                    >
-                                </div>
-
-                                <button type="submit" class="btn-primary" style="width:100%;" id="create-btn">
-                                    Создать заказ
-                                </button>
                             </form>
 
                             <div id="link-result"></div>
@@ -1190,191 +1201,90 @@
                     </div>
                 </section>
 
-                <!-- ============ PAGE: ORDERS ============ -->
-                <section class="page" data-page-content="orders">
-                    <div class="orders-toolbar">
-                        <button class="filter-chip active" data-status="">Все</button>
-                        <button class="filter-chip" data-status="created">Создан</button>
-                        <button class="filter-chip" data-status="awaiting_phone">Ждём номер</button>
-                        <button class="filter-chip" data-status="awaiting_form">Ждём форму</button>
-                        <button class="filter-chip" data-status="awaiting_docs">Ждём документы</button>
-                        <button class="filter-chip" data-status="completed">Завершён</button>
-                        <button class="filter-chip" data-status="cancelled">Отменён</button>
+                <!-- ============ ORDERS ============ -->
+                <section class="page-view" data-view="orders">
+                    <div class="page-header">
+                        <h2>Заказы</h2>
+                        <p>Все заказы в системе</p>
                     </div>
 
-                    <div class="orders-grid" id="orders-list">
-                        <div class="empty-state">Загрузка...</div>
-                    </div>
-                </section>
-
-                <!-- ============ PAGE: DOCS (visual only) ============ -->
-                <section class="page" data-page-content="docs">
-                    <div class="docs-grid">
-                        <div class="doc-type-card">
-                            <div class="doc-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">📋</div>
-                            <div class="doc-info">
-                                <h4>Накладные</h4>
-                                <p>Товарно-транспортные</p>
-                            </div>
-                            <div class="doc-count">0</div>
-                        </div>
-                        <div class="doc-type-card">
-                            <div class="doc-icon" style="background:rgba(168,85,247,0.15);color:#c084fc;">📑</div>
-                            <div class="doc-info">
-                                <h4>ТТН</h4>
-                                <p>Транспортные накладные</p>
-                            </div>
-                            <div class="doc-count">0</div>
-                        </div>
-                        <div class="doc-type-card">
-                            <div class="doc-icon" style="background:rgba(34,197,94,0.15);color:#4ade80;">✅</div>
-                            <div class="doc-info">
-                                <h4>Акты осмотра</h4>
-                                <p>Подтверждения водителей</p>
-                            </div>
-                            <div class="doc-count">0</div>
-                        </div>
-                        <div class="doc-type-card">
-                            <div class="doc-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24;">📜</div>
-                            <div class="doc-info">
-                                <h4>Доверенности</h4>
-                                <p>На получение груза</p>
-                            </div>
-                            <div class="doc-count">0</div>
-                        </div>
+                    <div class="filters">
+                        <button class="filter active" data-status="">Все</button>
+                        <button class="filter" data-status="created">Создан</button>
+                        <button class="filter" data-status="awaiting_phone">Ждём номер</button>
+                        <button class="filter" data-status="awaiting_form">Ждём форму</button>
+                        <button class="filter" data-status="awaiting_docs">Ждём документы</button>
+                        <button class="filter" data-status="completed">Завершён</button>
+                        <button class="filter" data-status="cancelled">Отменён</button>
                     </div>
 
-                    <div class="card" style="margin-bottom:16px;">
-                        <div class="card-title">
-                            Последние документы
-                            <span class="card-subtitle">Раздел в разработке</span>
-                        </div>
-                        <div class="empty-state">
-                            <div class="empty-state-icon">📄</div>
-                            Здесь будут отображаться загруженные документы.<br>
-                            <span style="color:var(--text-dim); font-size:12px;">Функционал появится в следующей версии</span>
-                        </div>
+                    <div class="orders-list" id="orders-list">
+                        <div class="empty">Загрузка...</div>
                     </div>
                 </section>
 
-                <!-- ============ PAGE: ARCHIVE (visual only) ============ -->
-                <section class="page" data-page-content="archive">
+                <!-- ============ DOCS (placeholder) ============ -->
+                <section class="page-view" data-view="docs">
+                    <div class="page-header">
+                        <h2>Документы</h2>
+                        <p>Накладные, ТТН и акты осмотра</p>
+                    </div>
+
                     <div class="card">
-                        <div class="card-title">
-                            Архив заказов
-                            <span class="card-subtitle">Раздел в разработке</span>
-                        </div>
-                        <div class="empty-state">
-                            <div class="empty-state-icon">🗂️</div>
-                            Здесь будут храниться завершённые заказы старше 30 дней.<br>
-                            <span style="color:var(--text-dim); font-size:12px;">Функционал появится в следующей версии</span>
+                        <div class="placeholder">
+                            <div class="placeholder-icon">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                    <polyline points="14 2 14 8 20 8"/>
+                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                </svg>
+                            </div>
+                            <h3>Раздел в разработке</h3>
+                            <p>Здесь появятся все документы, привязанные к заказам: накладные, ТТН, акты осмотра и доверенности.</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- ============ PAGE: SETTINGS (visual only) ============ -->
-                <section class="page" data-page-content="settings">
-                    <div class="settings-layout">
-                        <div class="card">
-                            <div class="card-title">Интеграция с MAX</div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Бот-уведомления</h4>
-                                    <p>Отправлять подтверждения водителям</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
-                            </div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Проверка номера</h4>
-                                    <p>Сверять телефон водителя с указанным</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" checked disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
-                            </div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Уведомления администратору</h4>
-                                    <p>Пинговать при смене статуса заказа</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
-                            </div>
-                        </div>
+                <!-- ============ ARCHIVE (placeholder) ============ -->
+                <section class="page-view" data-view="archive">
+                    <div class="page-header">
+                        <h2>Архив</h2>
+                        <p>Завершённые заказы старше 30 дней</p>
+                    </div>
 
-                        <div class="card">
-                            <div class="card-title">Уведомления</div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Email-отчёты</h4>
-                                    <p>Ежедневная сводка на почту</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
+                    <div class="card">
+                        <div class="placeholder">
+                            <div class="placeholder-icon">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="21 8 21 21 3 21 3 8"/>
+                                    <rect x="1" y="3" width="22" height="5" rx="1"/>
+                                    <line x1="10" y1="12" x2="14" y2="12"/>
+                                </svg>
                             </div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Telegram-уведомления</h4>
-                                    <p>Дублировать события в Telegram</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
-                            </div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>SMS-оповещения</h4>
-                                    <p>Отправлять водителям SMS</p>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" disabled>
-                                    <span class="switch-slider"></span>
-                                </label>
-                            </div>
+                            <h3>Раздел в разработке</h3>
+                            <p>Здесь будут храниться завершённые заказы для истории и аудита.</p>
                         </div>
+                    </div>
+                </section>
 
-                        <div class="card">
-                            <div class="card-title">Профиль</div>
-                            <div class="field">
-                                <label>Имя администратора</label>
-                                <input type="text" value="Администратор" disabled>
-                            </div>
-                            <div class="field">
-                                <label>Email</label>
-                                <input type="email" placeholder="admin@example.com" disabled>
-                            </div>
-                            <div class="field" style="margin-bottom:0;">
-                                <label>Роль</label>
-                                <input type="text" value="Диспетчер" disabled>
-                            </div>
-                        </div>
+                <!-- ============ SETTINGS (placeholder) ============ -->
+                <section class="page-view" data-view="settings">
+                    <div class="page-header">
+                        <h2>Настройки</h2>
+                        <p>Параметры системы и интеграции</p>
+                    </div>
 
-                        <div class="card danger-zone">
-                            <div class="card-title">Опасная зона</div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Очистить все данные</h4>
-                                    <p>Удалить все заказы и историю</p>
-                                </div>
-                                <button class="btn-danger btn-sm" disabled>Очистить</button>
+                    <div class="card">
+                        <div class="placeholder">
+                            <div class="placeholder-icon">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
                             </div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <h4>Удалить аккаунт</h4>
-                                    <p>Полное удаление всех данных системы</p>
-                                </div>
-                                <button class="btn-danger btn-sm" disabled>Удалить</button>
-                            </div>
+                            <h3>Раздел в разработке</h3>
+                            <p>Здесь будут управление интеграцией с MAX, уведомления, шаблоны сообщений и параметры аккаунта.</p>
                         </div>
                     </div>
                 </section>
@@ -1383,11 +1293,11 @@
         </main>
     </div>
 
-    <!-- ============ МОДАЛКА ============ -->
+    <!-- ============ MODAL ============ -->
     <div class="modal-backdrop" id="modal">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="modal-title">Заказ</h2>
+                <h2 id="modal-title">Заказ <span class="id" id="modal-id"></span></h2>
                 <button class="modal-close" id="modal-close">×</button>
             </div>
             <div class="modal-body" id="modal-body"></div>
@@ -1395,56 +1305,55 @@
         </div>
     </div>
 
-    <!-- ============ TOASTS ============ -->
-    <div class="toast-wrap" id="toasts"></div>
+    <div class="toasts" id="toasts"></div>
 
     <script>
-        // ============ КОНФИГ ============
+        // ============ CONFIG ============
         const API_BASE = '';
         const STORAGE_KEY = 'cargo_admin_password';
 
-        const PAGE_META = {
-            dashboard: { title: 'Главная', subtitle: 'Обзор текущей ситуации' },
-            create: { title: 'Создать заказ', subtitle: 'Оформление нового заказа на перевозку' },
-            orders: { title: 'Заказы', subtitle: 'Все заказы в системе' },
-            docs: { title: 'Документы', subtitle: 'Накладные, ТТН и акты осмотра' },
-            archive: { title: 'Архив', subtitle: 'Завершённые заказы' },
-            settings: { title: 'Настройки', subtitle: 'Параметры системы' },
+        const PAGE_TITLES = {
+            dashboard: 'Главная',
+            create: 'Новый заказ',
+            orders: 'Заказы',
+            docs: 'Документы',
+            archive: 'Архив',
+            settings: 'Настройки',
         };
 
         let password = localStorage.getItem(STORAGE_KEY) || '';
         let currentFilter = '';
-        let currentOrders = [];
+        let allOrders = [];
         let currentPage = 'dashboard';
 
-        // ============ ХЕЛПЕРЫ ============
-        const $ = (sel) => document.querySelector(sel);
-        const $$ = (sel) => document.querySelectorAll(sel);
+        // ============ HELPERS ============
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
 
-        function toast(message, type = 'info') {
+        function toast(msg, type = 'info') {
             const el = document.createElement('div');
             el.className = 'toast ' + type;
-            el.textContent = message;
+            el.textContent = msg;
             $('#toasts').appendChild(el);
             setTimeout(() => el.remove(), 3500);
         }
 
-        function escapeHtml(str) {
+        function esc(str) {
             if (str === null || str === undefined) return '';
             return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;');
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function api(path, options = {}) {
-            const headers = {
-                'Content-Type': 'application/json',
-                'X-Admin-Password': password,
-                ...(options.headers || {}),
-            };
-            return fetch(API_BASE + path, { ...options, headers });
+            return fetch(API_BASE + path, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Password': password,
+                    ...(options.headers || {}),
+                },
+            });
         }
 
         const STATUS_LABELS = {
@@ -1456,82 +1365,58 @@
             cancelled: 'Отменён',
         };
 
-        function statusBadge(status) {
-            const label = STATUS_LABELS[status] || status;
-            return `<span class="status status-${status}">${label}</span>`;
+        function statusBadge(s) {
+            return `<span class="status status-${s}"><span class="sdot"></span>${STATUS_LABELS[s] || s}</span>`;
         }
 
-        function formatDate(iso) {
+        function fmtDate(iso) {
             if (!iso) return '—';
-            const d = new Date(iso);
-            return d.toLocaleString('ru-RU', {
+            return new Date(iso).toLocaleString('ru-RU', {
                 day: '2-digit', month: '2-digit', year: 'numeric',
                 hour: '2-digit', minute: '2-digit',
             });
         }
 
-        // ============ НАВИГАЦИЯ ============
-        function gotoPage(pageName) {
-            if (!PAGE_META[pageName]) return;
-            currentPage = pageName;
+        // ============ NAVIGATION ============
+        function gotoPage(name) {
+            if (!PAGE_TITLES[name]) return;
+            currentPage = name;
 
-            $$('.nav-item').forEach(el => {
-                el.classList.toggle('active', el.dataset.page === pageName);
-            });
-            $$('.page').forEach(el => {
-                el.classList.toggle('active', el.dataset.pageContent === pageName);
-            });
+            $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === name));
+            $$('.page-view').forEach(el => el.classList.toggle('active', el.dataset.view === name));
+            $('#topbar-title').textContent = PAGE_TITLES[name];
 
-            $('#page-title').textContent = PAGE_META[pageName].title;
-            $('#page-subtitle').textContent = PAGE_META[pageName].subtitle;
-
-            // Обновляем данные при переходе на нужные страницы
-            if (pageName === 'orders' || pageName === 'dashboard') {
-                loadOrders();
-            }
-
-            // Закрываем мобильный sidebar
+            if (name === 'orders' || name === 'dashboard') loadOrders();
             $('#sidebar').classList.remove('open');
         }
 
-        $$('.nav-item').forEach(item => {
-            item.addEventListener('click', () => gotoPage(item.dataset.page));
-        });
-
-        // Быстрые действия и стат-карточки
-        $$('[data-goto]').forEach(el => {
-            el.addEventListener('click', () => gotoPage(el.dataset.goto));
-        });
-        $$('.stat-card[data-goto-status]').forEach(card => {
+        $$('.nav-item').forEach(el => el.addEventListener('click', () => gotoPage(el.dataset.page)));
+        $$('[data-goto]').forEach(el => el.addEventListener('click', () => gotoPage(el.dataset.goto)));
+        $$('.stat[data-goto-status]').forEach(card => {
             card.addEventListener('click', () => {
                 const status = card.dataset.gotoStatus;
                 gotoPage('orders');
-                // Устанавливаем фильтр
-                $$('.filter-chip').forEach(c => {
-                    c.classList.toggle('active', c.dataset.status === status);
-                });
+                $$('.filter').forEach(c => c.classList.toggle('active', c.dataset.status === status));
                 currentFilter = status;
                 loadOrders();
             });
         });
 
-        // ============ АВТОРИЗАЦИЯ ============
-        function showAuth() {
-            $('#auth-screen').style.display = 'flex';
-            $('#main-app').style.display = 'none';
+        // ============ AUTH ============
+        function showLogin() {
+            $('#login-screen').style.display = 'flex';
+            $('#app').style.display = 'none';
             $('#password-input').focus();
         }
-
         function showApp() {
-            $('#auth-screen').style.display = 'none';
-            $('#main-app').style.display = 'flex';
+            $('#login-screen').style.display = 'none';
+            $('#app').style.display = 'flex';
             gotoPage('dashboard');
         }
 
         $('#login-btn').addEventListener('click', async () => {
             const pwd = $('#password-input').value.trim();
             if (!pwd) return toast('Введите пароль', 'error');
-
             password = pwd;
             const res = await api('/api/orders');
             if (res.ok) {
@@ -1544,27 +1429,20 @@
                 toast('Неверный пароль', 'error');
             }
         });
-
-        $('#password-input').addEventListener('keydown', (e) => {
+        $('#password-input').addEventListener('keydown', e => {
             if (e.key === 'Enter') $('#login-btn').click();
         });
-
         $('#logout-btn').addEventListener('click', () => {
+            if (!confirm('Выйти из системы?')) return;
             password = '';
             localStorage.removeItem(STORAGE_KEY);
-            showAuth();
+            showLogin();
         });
 
-        $('#sidebar-toggle').addEventListener('click', () => {
-            $('#sidebar').classList.toggle('open');
-        });
+        $('#mobile-toggle').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+        $('#refresh-btn').addEventListener('click', () => { loadOrders(); toast('Обновлено'); });
 
-        $('#refresh-btn').addEventListener('click', () => {
-            loadOrders();
-            toast('Обновлено', 'info');
-        });
-
-        // ============ МАСКА ТЕЛЕФОНА ============
+        // ============ PHONE MASK ============
         const today = new Date().toISOString().split('T')[0];
         document.querySelector('input[name="ship_date"]').value = today;
         document.querySelector('input[name="ship_date"]').min = today;
@@ -1572,49 +1450,47 @@
         const phoneInput = document.getElementById('phone-input');
 
         function formatPhone(raw) {
-            let digits = String(raw).replace(/\D/g, '');
-            if (digits.startsWith('8') || digits.startsWith('7')) digits = digits.slice(1);
-            digits = digits.slice(0, 10);
-
-            let result = '+7';
-            if (digits.length > 0) result += ' (' + digits.slice(0, 3);
-            if (digits.length >= 3) result += ') ' + digits.slice(3, 6);
-            if (digits.length >= 6) result += '-' + digits.slice(6, 8);
-            if (digits.length >= 8) result += '-' + digits.slice(8, 10);
-            return result;
+            let d = String(raw).replace(/\D/g, '');
+            if (d.startsWith('8') || d.startsWith('7')) d = d.slice(1);
+            d = d.slice(0, 10);
+            let r = '+7';
+            if (d.length > 0) r += ' (' + d.slice(0, 3);
+            if (d.length >= 3) r += ') ' + d.slice(3, 6);
+            if (d.length >= 6) r += '-' + d.slice(6, 8);
+            if (d.length >= 8) r += '-' + d.slice(8, 10);
+            return r;
         }
-
         function isPhoneComplete(raw) {
-            const digits = String(raw).replace(/\D/g, '');
-            return digits.length === 11;
+            return String(raw).replace(/\D/g, '').length === 11;
         }
 
-        phoneInput.addEventListener('input', (e) => {
-            const cursorAtEnd = e.target.selectionStart === e.target.value.length;
-            const formatted = formatPhone(e.target.value);
-            e.target.value = formatted;
-            if (cursorAtEnd) e.target.setSelectionRange(formatted.length, formatted.length);
-
+        phoneInput.addEventListener('input', e => {
+            const atEnd = e.target.selectionStart === e.target.value.length;
+            const f = formatPhone(e.target.value);
+            e.target.value = f;
+            if (atEnd) e.target.setSelectionRange(f.length, f.length);
             e.target.classList.remove('valid', 'invalid');
-            if (formatted === '+7') return;
-            if (isPhoneComplete(formatted)) e.target.classList.add('valid');
-            else if (formatted.length > 4) e.target.classList.add('invalid');
+            if (f === '+7') return;
+            if (isPhoneComplete(f)) e.target.classList.add('valid');
+            else if (f.length > 4) e.target.classList.add('invalid');
         });
-
-        phoneInput.addEventListener('paste', (e) => {
+        phoneInput.addEventListener('paste', e => {
             e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData('text');
-            phoneInput.value = formatPhone(text);
+            phoneInput.value = formatPhone((e.clipboardData || window.clipboardData).getData('text'));
             phoneInput.dispatchEvent(new Event('input'));
         });
-
         phoneInput.addEventListener('blur', () => {
-            if (!isPhoneComplete(phoneInput.value)) {
-                phoneInput.classList.remove('valid', 'invalid');
-            }
+            if (!isPhoneComplete(phoneInput.value)) phoneInput.classList.remove('valid', 'invalid');
         });
 
-        // ============ СОЗДАНИЕ ЗАКАЗА ============
+        // ============ CREATE ORDER ============
+        $('#create-reset').addEventListener('click', () => {
+            $('#create-form').reset();
+            document.querySelector('input[name="ship_date"]').value = today;
+            phoneInput.classList.remove('valid', 'invalid');
+            $('#link-result').innerHTML = '';
+        });
+
         $('#create-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = $('#create-btn');
@@ -1636,30 +1512,24 @@
                     to: fd.get('to'),
                     ship_date: fd.get('ship_date'),
                 },
-                loader: {
-                    phone_expected: fd.get('phone_expected').replace(/\D/g, ''),
-                },
+                loader: { phone_expected: fd.get('phone_expected').replace(/\D/g, '') },
             };
 
             try {
-                const res = await api('/api/orders', {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                });
+                const res = await api('/api/orders', { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
-
                 if (res.ok && result.success) {
                     toast('Заказ создан: ' + result.order.id, 'success');
                     e.target.reset();
                     document.querySelector('input[name="ship_date"]').value = today;
+                    phoneInput.classList.remove('valid', 'invalid');
                     showLinkBox(result);
                     loadOrders();
                 } else {
                     const msg = result.details ? result.details.join('; ') : (result.error || 'Ошибка');
                     toast(msg, 'error');
                 }
-            } catch (err) {
-                console.error(err);
+            } catch {
                 toast('Ошибка сети', 'error');
             } finally {
                 btn.disabled = false;
@@ -1673,19 +1543,19 @@
                 $('#link-result').innerHTML = `
                     <div class="link-box">
                         <div class="link-box-label">Ссылка не сгенерирована</div>
-                        <div style="font-size:12px;color:#f87171;">
-                            Проверьте переменную окружения BOT_USERNAME на Vercel
-                        </div>
+                        <div style="font-size:13px;color:var(--red);">Проверьте переменную BOT_USERNAME на Vercel</div>
                     </div>`;
                 return;
             }
             $('#link-result').innerHTML = `
                 <div class="link-box">
-                    <div class="link-box-label">Ссылка для водителя (${escapeHtml(result.order.id)})</div>
-                    <div class="link-box-value">${escapeHtml(link)}</div>
-                    <button class="btn-primary btn-sm" id="copy-link">Скопировать ссылку</button>
+                    <div class="link-box-label">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Ссылка для водителя · ${esc(result.order.id)}
+                    </div>
+                    <div class="link-box-value">${esc(link)}</div>
+                    <button class="btn btn-primary btn-sm" id="copy-link">Скопировать</button>
                 </div>`;
-
             $('#copy-link').addEventListener('click', () => {
                 navigator.clipboard.writeText(link).then(
                     () => toast('Ссылка скопирована', 'success'),
@@ -1694,227 +1564,192 @@
             });
         }
 
-        // ============ СПИСОК ЗАКАЗОВ ============
+        // ============ ORDERS LIST ============
         async function loadOrders() {
             if (!password) return;
             try {
-                const path = currentFilter
-                    ? `/api/orders?status=${currentFilter}`
-                    : '/api/orders';
+                const path = currentFilter ? `/api/orders?status=${currentFilter}` : '/api/orders';
                 const res = await api(path);
-                if (res.status === 401) {
-                    showAuth();
-                    return;
-                }
+                if (res.status === 401) { showLogin(); return; }
                 const data = await res.json();
-                currentOrders = data.orders || [];
+                allOrders = data.orders || [];
                 renderOrders();
-                renderDashboardStats();
-                renderRecentOrders();
-            } catch (err) {
-                console.error(err);
-                $('#orders-list').innerHTML = '<div class="empty-state">Ошибка загрузки</div>';
+                renderStats();
+                renderRecent();
+            } catch {
+                $('#orders-list').innerHTML = '<div class="empty">Ошибка загрузки</div>';
             }
         }
 
         function renderOrders() {
-            const badge = $('#orders-count-badge');
-            if (badge) badge.textContent = currentOrders.length;
+            const badge = $('#orders-badge');
+            if (badge) badge.textContent = allOrders.length;
 
-            if (!currentOrders.length) {
-                $('#orders-list').innerHTML = `
-                    <div class="empty-state" style="grid-column:1/-1;">
-                        <div class="empty-state-icon">📦</div>
-                        Пока нет заказов${currentFilter ? ' в этом статусе' : ''}
-                    </div>`;
+            if (!allOrders.length) {
+                $('#orders-list').innerHTML = `<div class="empty">Пока нет заказов${currentFilter ? ' в этом статусе' : ''}</div>`;
                 return;
             }
 
-            $('#orders-list').innerHTML = currentOrders.map(o => `
-                <div class="order-card" data-id="${escapeHtml(o.id)}">
-                    <div class="order-card-header">
-                        <span class="order-id">${escapeHtml(o.id)}</span>
-                        ${statusBadge(o.status)}
+            $('#orders-list').innerHTML = allOrders.map(o => `
+                <div class="order-row" data-id="${esc(o.id)}">
+                    <div class="order-row-id">${esc(o.id)}</div>
+                    <div class="order-row-main">
+                        <div class="order-row-name">${esc(o.cargo.name || '—')}</div>
+                        <div class="order-row-route">${esc(o.route.from || '—')} → ${esc(o.route.to || '—')}</div>
                     </div>
-                    <div class="order-name">${escapeHtml(o.cargo.name || '—')}</div>
-                    <div class="order-route">
-                        ${escapeHtml(o.route.from || '—')} → ${escapeHtml(o.route.to || '—')}
+                    <div class="order-row-meta">
+                        <span>${o.cargo.weight} кг</span>
+                        <span>${o.cargo.places} мест</span>
+                        <span>${esc(o.route.ship_date)}</span>
                     </div>
-                    <div class="order-meta">
-                        <span>⚖️ ${o.cargo.weight} кг</span>
-                        <span>📦 ${o.cargo.places} мест</span>
-                        <span>📅 ${escapeHtml(o.route.ship_date)}</span>
-                    </div>
+                    <div>${statusBadge(o.status)}</div>
                 </div>
             `).join('');
 
-            $$('.order-card').forEach(el => {
-                el.addEventListener('click', () => openOrder(el.dataset.id));
-            });
+            $$('.order-row').forEach(el => el.addEventListener('click', () => openOrder(el.dataset.id)));
         }
 
-        function renderDashboardStats() {
-            const stats = {
-                total: currentOrders.length,
-                awaiting_phone: 0,
-                awaiting_form: 0,
-                awaiting_docs: 0,
-                completed: 0,
-            };
-            currentOrders.forEach(o => {
-                if (stats[o.status] !== undefined) stats[o.status]++;
-            });
-
-            $('#stat-total').textContent = stats.total;
-            $('#stat-awaiting-phone').textContent = stats.awaiting_phone;
-            $('#stat-awaiting-form').textContent = stats.awaiting_form;
-            $('#stat-awaiting-docs').textContent = stats.awaiting_docs;
-            $('#stat-completed').textContent = stats.completed;
+        function renderStats() {
+            const s = { total: allOrders.length, awaiting_phone: 0, awaiting_form: 0, awaiting_docs: 0, completed: 0 };
+            allOrders.forEach(o => { if (s[o.status] !== undefined) s[o.status]++; });
+            $('#stat-total').textContent = s.total;
+            $('#stat-phone').textContent = s.awaiting_phone;
+            $('#stat-form').textContent = s.awaiting_form;
+            $('#stat-docs').textContent = s.awaiting_docs;
+            $('#stat-done').textContent = s.completed;
         }
 
-        function renderRecentOrders() {
-            const recent = currentOrders.slice(0, 5);
+        function renderRecent() {
+            const recent = allOrders.slice(0, 5);
             if (!recent.length) {
-                $('#recent-orders').innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📦</div>
-                        Пока нет заказов
-                    </div>`;
+                $('#recent-list').innerHTML = '<div class="empty" style="padding:40px 0;">Заказов пока нет</div>';
                 return;
             }
-
-            $('#recent-orders').innerHTML = recent.map(o => `
-                <div class="order-card" style="margin-bottom:10px;" data-id="${escapeHtml(o.id)}">
-                    <div class="order-card-header">
-                        <span class="order-id">${escapeHtml(o.id)}</span>
-                        ${statusBadge(o.status)}
+            $('#recent-list').innerHTML = recent.map(o => `
+                <div class="recent-item" data-id="${esc(o.id)}">
+                    <div class="recent-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                     </div>
-                    <div class="order-name">${escapeHtml(o.cargo.name || '—')}</div>
-                    <div class="order-route">
-                        ${escapeHtml(o.route.from || '—')} → ${escapeHtml(o.route.to || '—')}
+                    <div class="recent-body">
+                        <div class="recent-name">${esc(o.cargo.name || '—')}</div>
+                        <div class="recent-route">${esc(o.route.from || '—')} → ${esc(o.route.to || '—')}</div>
                     </div>
+                    ${statusBadge(o.status)}
                 </div>
             `).join('');
-
-            $$('#recent-orders .order-card').forEach(el => {
-                el.addEventListener('click', () => openOrder(el.dataset.id));
-            });
+            $$('.recent-item').forEach(el => el.addEventListener('click', () => openOrder(el.dataset.id)));
         }
 
-        // ============ ФИЛЬТРЫ ============
-        $$('.filter-chip').forEach(chip => {
+        // ============ FILTERS ============
+        $$('.filter').forEach(chip => {
             chip.addEventListener('click', () => {
-                $$('.filter-chip').forEach(c => c.classList.remove('active'));
+                $$('.filter').forEach(c => c.classList.remove('active'));
                 chip.classList.add('active');
                 currentFilter = chip.dataset.status;
                 loadOrders();
             });
         });
 
-        // ============ МОДАЛКА ЗАКАЗА ============
+        // ============ ORDER MODAL ============
         function openOrder(id) {
-            const order = currentOrders.find(o => o.id === id);
-            if (!order) return;
-
-            $('#modal-title').textContent = 'Заказ ' + order.id;
-            $('#modal-body').innerHTML = renderOrderDetail(order);
-            $('#modal-actions').innerHTML = renderOrderActions(order);
+            const o = allOrders.find(x => x.id === id);
+            if (!o) return;
+            $('#modal-id').textContent = o.id;
+            $('#modal-body').innerHTML = renderDetail(o);
+            $('#modal-actions').innerHTML = renderActions(o);
             $('#modal').classList.add('show');
-
             $$('#modal-actions button[data-action]').forEach(btn => {
-                btn.addEventListener('click', () => handleOrderAction(order, btn.dataset.action));
+                btn.addEventListener('click', () => handleAction(o, btn.dataset.action));
             });
         }
 
-        function renderOrderDetail(o) {
+        function renderDetail(o) {
             const l = o.loader || {};
             const i = o.inspection;
 
-            let html = `
-                <div class="detail-section">
-                    <h3>Статус</h3>
+            let h = `
+                <div class="detail-block">
+                    <h4>Статус</h4>
                     <div>${statusBadge(o.status)}</div>
                 </div>
 
-                <div class="detail-section">
-                    <h3>Груз</h3>
-                    <div class="detail-row"><span class="label">Наименование</span><span class="value">${escapeHtml(o.cargo.name)}</span></div>
-                    <div class="detail-row"><span class="label">Вес</span><span class="value">${o.cargo.weight} кг</span></div>
-                    <div class="detail-row"><span class="label">Мест</span><span class="value">${o.cargo.places}</span></div>
-                    <div class="detail-row"><span class="label">Габариты</span><span class="value">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
+                <div class="detail-block">
+                    <h4>Груз</h4>
+                    <div class="detail-list">
+                        <div class="detail-item"><span class="k">Наименование</span><span class="v">${esc(o.cargo.name)}</span></div>
+                        <div class="detail-item"><span class="k">Вес</span><span class="v">${o.cargo.weight} кг</span></div>
+                        <div class="detail-item"><span class="k">Мест</span><span class="v">${o.cargo.places}</span></div>
+                        <div class="detail-item"><span class="k">Габариты</span><span class="v">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
+                    </div>
                 </div>
 
-                <div class="detail-section">
-                    <h3>Маршрут</h3>
-                    <div class="detail-row"><span class="label">Откуда</span><span class="value">${escapeHtml(o.route.from)}</span></div>
-                    <div class="detail-row"><span class="label">Куда</span><span class="value">${escapeHtml(o.route.to)}</span></div>
-                    <div class="detail-row"><span class="label">Дата отправки</span><span class="value">${escapeHtml(o.route.ship_date)}</span></div>
+                <div class="detail-block">
+                    <h4>Маршрут</h4>
+                    <div class="detail-list">
+                        <div class="detail-item"><span class="k">Откуда</span><span class="v">${esc(o.route.from)}</span></div>
+                        <div class="detail-item"><span class="k">Куда</span><span class="v">${esc(o.route.to)}</span></div>
+                        <div class="detail-item"><span class="k">Дата отправки</span><span class="v">${esc(o.route.ship_date)}</span></div>
+                    </div>
                 </div>
 
-                <div class="detail-section">
-                    <h3>Водитель</h3>
-                    <div class="detail-row"><span class="label">Телефон (ожидается)</span><span class="value">${escapeHtml(l.phone_expected || '—')}</span></div>
-                    <div class="detail-row"><span class="label">Телефон (получен)</span><span class="value">${escapeHtml(l.phone_received || '—')}</span></div>
-                    <div class="detail-row"><span class="label">MAX User ID</span><span class="value">${escapeHtml(l.max_user_id || '—')}</span></div>
-                    <div class="detail-row"><span class="label">Имя</span><span class="value">${escapeHtml(((l.first_name || '') + ' ' + (l.last_name || '')).trim() || '—')}</span></div>
-                    <div class="detail-row"><span class="label">Username</span><span class="value">${l.username ? '@' + escapeHtml(l.username) : '—'}</span></div>
+                <div class="detail-block">
+                    <h4>Водитель</h4>
+                    <div class="detail-list">
+                        <div class="detail-item"><span class="k">Ожидается</span><span class="v">${esc(l.phone_expected || '—')}</span></div>
+                        <div class="detail-item"><span class="k">Получен</span><span class="v">${esc(l.phone_received || '—')}</span></div>
+                        <div class="detail-item"><span class="k">MAX ID</span><span class="v">${esc(l.max_user_id || '—')}</span></div>
+                        <div class="detail-item"><span class="k">Имя</span><span class="v">${esc(((l.first_name || '') + ' ' + (l.last_name || '')).trim() || '—')}</span></div>
+                        <div class="detail-item"><span class="k">Username</span><span class="v">${l.username ? '@' + esc(l.username) : '—'}</span></div>
+                    </div>
                 </div>
             `;
 
             if (i) {
-                html += `
-                    <div class="detail-section">
-                        <h3>Осмотр груза</h3>
-                        <div class="checklist">
-                            <div class="check-item ${i.check_packaging ? 'yes' : 'no'}">Упаковка целая</div>
-                            <div class="check-item ${i.check_marking ? 'yes' : 'no'}">Маркировка читаемая</div>
-                            <div class="check-item ${i.check_weight_actual ? 'yes' : 'no'}">Вес совпадает</div>
-                            <div class="check-item ${i.check_no_damage ? 'yes' : 'no'}">Повреждения отсутствуют</div>
-                            <div class="check-item ${i.check_no_odor ? 'yes' : 'no'}">Посторонние запахи отсутствуют</div>
-                            <div class="check-item ${i.check_docs ? 'yes' : 'no'}">Документы в наличии</div>
+                h += `
+                    <div class="detail-block">
+                        <h4>Осмотр груза</h4>
+                        <div class="check-list">
+                            <div class="check-row ${i.check_packaging ? 'yes' : 'no'}"><span class="cicon">${i.check_packaging ? '✓' : '✕'}</span>Упаковка целая</div>
+                            <div class="check-row ${i.check_marking ? 'yes' : 'no'}"><span class="cicon">${i.check_marking ? '✓' : '✕'}</span>Маркировка читаемая</div>
+                            <div class="check-row ${i.check_weight_actual ? 'yes' : 'no'}"><span class="cicon">${i.check_weight_actual ? '✓' : '✕'}</span>Вес совпадает</div>
+                            <div class="check-row ${i.check_no_damage ? 'yes' : 'no'}"><span class="cicon">${i.check_no_damage ? '✓' : '✕'}</span>Повреждения отсутствуют</div>
+                            <div class="check-row ${i.check_no_odor ? 'yes' : 'no'}"><span class="cicon">${i.check_no_odor ? '✓' : '✕'}</span>Посторонние запахи отсутствуют</div>
+                            <div class="check-row ${i.check_docs ? 'yes' : 'no'}"><span class="cicon">${i.check_docs ? '✓' : '✕'}</span>Документы в наличии</div>
                         </div>
-                        ${i.comment ? `<div style="margin-top:14px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;color:var(--text);border:1px solid var(--border);"><strong style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.4px;">Комментарий</strong><br>${escapeHtml(i.comment)}</div>` : ''}
-                        <div class="detail-row" style="margin-top:12px;"><span class="label">Подтверждено</span><span class="value">${formatDate(i.confirmed_at)}</span></div>
+                        ${i.comment ? `<div class="comment-box"><div class="label">Комментарий</div>${esc(i.comment)}</div>` : ''}
+                        <div class="detail-list" style="margin-top:12px;">
+                            <div class="detail-item"><span class="k">Подтверждено</span><span class="v">${fmtDate(i.confirmed_at)}</span></div>
+                        </div>
                     </div>
                 `;
             }
 
-            html += `
-                <div class="detail-section">
-                    <h3>История</h3>
-                    ${(o.history || []).map(h => `
-                        <div class="detail-row">
-                            <span class="label">${escapeHtml(h.event)}</span>
-                            <span class="value">${formatDate(h.at)}</span>
-                        </div>
-                    `).join('')}
+            h += `
+                <div class="detail-block">
+                    <h4>История</h4>
+                    <div class="detail-list">
+                        ${(o.history || []).map(x => `
+                            <div class="detail-item"><span class="k">${esc(x.event)}</span><span class="v">${fmtDate(x.at)}</span></div>
+                        `).join('')}
+                    </div>
                 </div>
             `;
 
-            return html;
+            return h;
         }
 
-        function renderOrderActions(o) {
-            const actions = [];
-            if (o.status === 'awaiting_docs') {
-                actions.push(`<button class="btn-primary" data-action="complete">Завершить заказ</button>`);
-            }
-            if (o.status !== 'completed' && o.status !== 'cancelled') {
-                actions.push(`<button class="btn-ghost" data-action="cancel">Отменить</button>`);
-            }
-            actions.push(`<button class="btn-ghost" data-action="close">Закрыть</button>`);
-            return actions.join('');
+        function renderActions(o) {
+            const a = [];
+            if (o.status === 'awaiting_docs') a.push('<button class="btn btn-primary" data-action="complete">Завершить заказ</button>');
+            if (o.status !== 'completed' && o.status !== 'cancelled') a.push('<button class="btn btn-secondary" data-action="cancel">Отменить</button>');
+            a.push('<button class="btn btn-ghost" data-action="close">Закрыть</button>');
+            return a.join('');
         }
 
-        async function handleOrderAction(order, action) {
-            if (action === 'close') {
-                $('#modal').classList.remove('show');
-                return;
-            }
-
-            if (action === 'complete') {
-                await patchStatus(order.id, 'completed');
-            } else if (action === 'cancel') {
+        async function handleAction(order, action) {
+            if (action === 'close') { $('#modal').classList.remove('show'); return; }
+            if (action === 'complete') await patchStatus(order.id, 'completed');
+            else if (action === 'cancel') {
                 if (!confirm('Отменить заказ?')) return;
                 await patchStatus(order.id, 'cancelled');
             }
@@ -1922,44 +1757,28 @@
 
         async function patchStatus(id, status) {
             try {
-                const res = await api('/api/order', {
-                    method: 'PATCH',
-                    body: JSON.stringify({ id, status }),
-                });
+                const res = await api('/api/order', { method: 'PATCH', body: JSON.stringify({ id, status }) });
                 const data = await res.json();
                 if (res.ok && data.success) {
                     toast('Статус обновлён', 'success');
                     $('#modal').classList.remove('show');
                     loadOrders();
-                } else {
-                    toast(data.error || 'Ошибка', 'error');
-                }
-            } catch (err) {
-                toast('Ошибка сети', 'error');
-            }
+                } else toast(data.error || 'Ошибка', 'error');
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         $('#modal-close').addEventListener('click', () => $('#modal').classList.remove('show'));
-        $('#modal').addEventListener('click', (e) => {
-            if (e.target === $('#modal')) $('#modal').classList.remove('show');
-        });
+        $('#modal').addEventListener('click', e => { if (e.target === $('#modal')) $('#modal').classList.remove('show'); });
 
-        // ============ АВТООБНОВЛЕНИЕ ============
+        // ============ AUTO REFRESH ============
         setInterval(() => {
-            if (password && !$('#modal').classList.contains('show')) {
-                loadOrders();
-            }
+            if (password && !$('#modal').classList.contains('show')) loadOrders();
         }, 15000);
 
-        // ============ ИНИЦИАЛИЗАЦИЯ ============
+        // ============ INIT ============
         if (password) {
-            api('/api/orders').then(res => {
-                if (res.ok) showApp();
-                else showAuth();
-            }).catch(() => showAuth());
-        } else {
-            showAuth();
-        }
+            api('/api/orders').then(res => res.ok ? showApp() : showLogin()).catch(showLogin);
+        } else showLogin();
     </script>
 </body>
 </html>
