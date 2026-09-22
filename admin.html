@@ -754,6 +754,7 @@
             flex-wrap: wrap;
             background: var(--bg-subtle);
             border-radius: 0 0 14px 14px;
+            align-items: center;
         }
 
         .detail-block { margin-bottom: 24px; }
@@ -1740,6 +1741,7 @@
 
         function renderActions(o) {
             const a = [];
+            a.push('<button class="btn btn-ghost" data-action="delete" style="color:var(--red); margin-right:auto;">Удалить заказ</button>');
             if (o.status === 'awaiting_docs') a.push('<button class="btn btn-primary" data-action="complete">Завершить заказ</button>');
             if (o.status !== 'completed' && o.status !== 'cancelled') a.push('<button class="btn btn-secondary" data-action="cancel">Отменить</button>');
             a.push('<button class="btn btn-ghost" data-action="close">Закрыть</button>');
@@ -1752,6 +1754,15 @@
             else if (action === 'cancel') {
                 if (!confirm('Отменить заказ?')) return;
                 await patchStatus(order.id, 'cancelled');
+            } else if (action === 'delete') {
+                const ok = confirm(
+                    `Удалить заказ ${order.id} безвозвратно?\n\n` +
+                    `Груз: ${order.cargo.name}\n` +
+                    `Маршрут: ${order.route.from} → ${order.route.to}\n\n` +
+                    `Это действие нельзя отменить.`
+                );
+                if (!ok) return;
+                await deleteOrderReq(order.id);
             }
         }
 
@@ -1764,6 +1775,20 @@
                     $('#modal').classList.remove('show');
                     loadOrders();
                 } else toast(data.error || 'Ошибка', 'error');
+            } catch { toast('Ошибка сети', 'error'); }
+        }
+
+        async function deleteOrderReq(id) {
+            try {
+                const res = await api(`/api/order?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    toast('Заказ удалён', 'success');
+                    $('#modal').classList.remove('show');
+                    loadOrders();
+                } else {
+                    toast(data.error || 'Ошибка удаления', 'error');
+                }
             } catch { toast('Ошибка сети', 'error'); }
         }
 
