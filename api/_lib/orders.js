@@ -1,28 +1,21 @@
-// api/_lib/orders.js
 import crypto from 'node:crypto';
 import { redis } from './redis.js';
 
 const ORDERS_INDEX = 'orders:all';
 
 export const ORDER_STATUS = {
-    CREATED: 'created',                   // создан, ссылка ещё не отправлена
-    AWAITING_PHONE: 'awaiting_phone',     // бот ждёт контакт грузчика
-    AWAITING_FORM: 'awaiting_form',       // номер подтверждён, ждём форму
-    AWAITING_DOCS: 'awaiting_docs',       // форма заполнена, ждём документы
-    COMPLETED: 'completed',               // закрыт
+    CREATED: 'created',
+    AWAITING_PHONE: 'awaiting_phone',
+    AWAITING_FORM: 'awaiting_form',
+    AWAITING_DOCS: 'awaiting_docs',
+    COMPLETED: 'completed',
     CANCELLED: 'cancelled',
 };
 
-/**
- * Генерирует короткий ID заказа.
- */
 function generateOrderId() {
     return 'ord_' + crypto.randomBytes(4).toString('hex');
 }
 
-/**
- * Создаёт новый заказ.
- */
 export async function createOrder({ cargo, route, loader }) {
     const id = generateOrderId();
     const now = new Date().toISOString();
@@ -32,7 +25,6 @@ export async function createOrder({ cargo, route, loader }) {
         status: ORDER_STATUS.CREATED,
         created_at: now,
         updated_at: now,
-
         cargo: {
             name: cargo.name || '',
             weight: parseFloat(cargo.weight) || 0,
@@ -41,13 +33,11 @@ export async function createOrder({ cargo, route, loader }) {
             width: parseFloat(cargo.width) || 0,
             height: parseFloat(cargo.height) || 0,
         },
-
         route: {
             from: route.from || '',
             to: route.to || '',
             ship_date: route.ship_date || '',
         },
-
         loader: {
             phone_expected: normalizePhone(loader.phone_expected || ''),
             phone_received: null,
@@ -56,38 +46,28 @@ export async function createOrder({ cargo, route, loader }) {
             last_name: null,
             username: null,
         },
-
         inspection: null,
-
-        history: [
-            { at: now, event: 'created', by: 'admin' },
-        ],
+        document_generated_at: null,
+        document_sent_at: null,
+        history: [{ at: now, event: 'created', by: 'admin' }],
     };
 
     await redis.set(`order:${id}`, order);
     await redis.sadd(ORDERS_INDEX, id);
-
     return order;
 }
 
-/**
- * Получает заказ по ID.
- */
 export async function getOrder(id) {
     if (!id) return null;
     return await redis.get(`order:${id}`);
 }
 
-/**
- * Обновляет заказ: merge полей и запись в историю.
- */
 export async function updateOrder(id, patch, historyEvent = null, by = 'system') {
     const order = await getOrder(id);
     if (!order) return null;
 
     const now = new Date().toISOString();
 
-    // Глубокое слияние для вложенных объектов
     for (const key of Object.keys(patch)) {
         if (patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])) {
             order[key] = { ...(order[key] || {}), ...patch[key] };
@@ -107,9 +87,15 @@ export async function updateOrder(id, patch, historyEvent = null, by = 'system')
     return order;
 }
 
-/**
- * Возвращает список всех заказов (опционально — фильтр по статусу).
- */
+export async function deleteOrder(id) {
+    if (!id) return false;
+    const exists = await redis.exists(`order:${id}`);
+    if (!exists) return false;
+    await redis.del(`order:${id}`);
+    await redis.srem(ORDERS_INDEX, id);
+    return true;
+}
+
 export async function listOrders({ status } = {}) {
     const ids = (await redis.smembers(ORDERS_INDEX)) || [];
     if (!ids.length) return [];
@@ -122,26 +108,19 @@ export async function listOrders({ status } = {}) {
         orders.push(order);
     }
 
-    // Свежие сверху
     orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return orders;
 }
 
-/**
- * Нормализует телефон: убирает всё, кроме цифр, и оставляет ведущий +.
- */
 export function normalizePhone(input) {
     if (!input) return '';
     const digits = String(input).replace(/\D/g, '');
     return digits ? '+' + digits : '';
 }
 
-/**
- * Формирует deep-link на бота для передачи грузчику.
- * ВАЖНО: формат ссылки нужно сверить с документацией MAX.
- */
 export function buildLoaderLink(orderId) {
     const botUsername = process.env.BOT_USERNAME;
     if (!botUsername) return null;
-    return `https://max.ru/${botUsername}?start=${orderId}`;
+    const clean = botUsername.replace('@', '');
+    return `https://max.ru/${clean}?start=${orderId}`;
 }
