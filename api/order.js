@@ -1,12 +1,36 @@
 // api/order.js
 import { checkAdminAuth } from './_lib/auth.js';
-import { getOrder, updateOrder, ORDER_STATUS } from './_lib/orders.js';
+import { getOrder, updateOrder, deleteOrder, ORDER_STATUS } from './_lib/orders.js';
 
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), {
         status,
         headers: { 'Content-Type': 'application/json' },
     });
+}
+
+/**
+ * DELETE /api/order?id=ord_xxxx
+ * Удаляет заказ. Только для администратора.
+ */
+export async function DELETE(request) {
+    const auth = checkAdminAuth(request);
+    if (!auth.ok) {
+        return jsonResponse({ error: auth.error }, 401);
+    }
+
+    const url = new URL(request.url);
+    const id = url.searchParams.get('id');
+    if (!id) return jsonResponse({ error: 'Не указан id заказа' }, 400);
+
+    try {
+        const ok = await deleteOrder(id);
+        if (!ok) return jsonResponse({ error: 'Заказ не найден' }, 404);
+        return jsonResponse({ success: true, deleted: id });
+    } catch (err) {
+        console.error('deleteOrder error:', err);
+        return jsonResponse({ error: 'Не удалось удалить заказ' }, 500);
+    }
 }
 
 /**
