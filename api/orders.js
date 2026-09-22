@@ -10,6 +10,21 @@ function jsonResponse(body, status = 200) {
 }
 
 /**
+ * Удаляет заказ по ID.
+ * @returns {boolean} — true, если заказ был найден и удалён.
+ */
+export async function deleteOrder(id) {
+    if (!id) return false;
+
+    const exists = await redis.exists(`order:${id}`);
+    if (!exists) return false;
+
+    await redis.del(`order:${id}`);
+    await redis.srem(ORDERS_INDEX, id);
+    return true;
+}
+
+/**
  * POST /api/orders — создание заказа администратором.
  */
 export async function POST(request) {
