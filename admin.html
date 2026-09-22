@@ -6,1209 +6,314 @@
     <title>Cargo Admin</title>
     <style>
         :root {
-            --bg: #fafafa;
-            --bg-card: #ffffff;
-            --bg-hover: #f5f5f5;
-            --bg-subtle: #f9fafb;
-            --border: #eaeaea;
-            --border-strong: #d4d4d4;
-            --text: #171717;
-            --text-muted: #737373;
-            --text-dim: #a3a3a3;
-            --accent: #171717;
-            --accent-hover: #000000;
-            --blue: #2563eb;
-            --green: #059669;
-            --yellow: #d97706;
-            --red: #dc2626;
-            --purple: #7c3aed;
-            --radius: 10px;
-            --radius-sm: 8px;
+            --bg: #fafafa; --bg-card: #ffffff; --bg-hover: #f5f5f5; --bg-subtle: #f9fafb;
+            --border: #eaeaea; --border-strong: #d4d4d4;
+            --text: #171717; --text-muted: #737373; --text-dim: #a3a3a3;
+            --accent: #171717; --accent-hover: #000000;
+            --blue: #2563eb; --green: #059669; --yellow: #d97706; --red: #dc2626; --purple: #7c3aed;
+            --radius: 10px; --radius-sm: 8px;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
             --shadow-lg: 0 20px 60px rgba(0,0,0,0.12);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
 
-        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            font-size: 14px;
-            line-height: 1.5;
-            min-height: 100vh;
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-        }
-
-        /* ============ LOGIN ============ */
-        .login-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 24px;
-        }
-        .login-card {
-            width: 100%;
-            max-width: 380px;
-        }
-        .login-logo {
-            width: 44px;
-            height: 44px;
-            background: var(--accent);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 28px;
-            color: #fff;
-        }
-        .login-card h1 {
-            font-size: 24px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-        .login-card > p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 32px;
-        }
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+        .login-card { width: 100%; max-width: 380px; }
+        .login-logo { width: 44px; height: 44px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 28px; color: #fff; }
+        .login-card h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .login-card > p { color: var(--text-muted); font-size: 14px; margin-bottom: 32px; }
         .login-form { display: flex; flex-direction: column; gap: 16px; }
 
-        /* ============ FORM ELEMENTS ============ */
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
+        label { display: block; font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 6px; }
         label .req { color: var(--red); margin-left: 2px; }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-strong);
-            background: var(--bg-card);
-            color: var(--text);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        input:hover, select:hover, textarea:hover { border-color: #b8b8b8; }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(23,23,23,0.08);
-        }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong); background: var(--bg-card); color: var(--text); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; transition: border-color 0.15s, box-shadow 0.15s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(23,23,23,0.08); }
         input::placeholder, textarea::placeholder { color: var(--text-dim); }
-        input:disabled { background: var(--bg-subtle); color: var(--text-dim); cursor: not-allowed; }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 9px 14px;
-            border: 1px solid transparent;
-            border-radius: var(--radius-sm);
-            font-size: 13.5px;
-            font-weight: 500;
-            font-family: inherit;
-            cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-            line-height: 1.2;
-        }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 14px; border: 1px solid transparent; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 500; font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; line-height: 1.2; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
+        .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
         .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
-
-        .btn-secondary {
-            background: var(--bg-card);
-            color: var(--text);
-            border-color: var(--border-strong);
-        }
+        .btn-secondary { background: var(--bg-card); color: var(--text); border-color: var(--border-strong); }
         .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-muted);
-            border-color: transparent;
-        }
+        .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
         .btn-ghost:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
-
-        .btn-danger {
-            background: var(--bg-card);
-            color: var(--red);
-            border-color: var(--border-strong);
-        }
-        .btn-danger:hover:not(:disabled) { background: #fef2f2; border-color: #fecaca; }
-
         .btn-sm { padding: 6px 10px; font-size: 13px; }
         .btn-block { width: 100%; }
 
-        /* ============ APP ============ */
         .app { display: flex; min-height: 100vh; }
-
-        /* ============ SIDEBAR ============ */
-        .sidebar {
-            width: 240px;
-            background: var(--bg-subtle);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            z-index: 40;
-        }
-
-        .sidebar-brand {
-            padding: 20px 18px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .brand-mark {
-            width: 28px; height: 28px;
-            background: var(--accent);
-            border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff;
-            flex-shrink: 0;
-        }
-        .brand-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.01em;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 4px 10px;
-            overflow-y: auto;
-        }
-        .nav-group {
-            padding: 16px 8px 6px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 10px;
-            border-radius: var(--radius-sm);
-            color: var(--text-muted);
-            font-size: 13.5px;
-            font-weight: 500;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.1s, color 0.1s;
-            margin-bottom: 1px;
-        }
+        .sidebar { width: 240px; background: var(--bg-subtle); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 40; }
+        .sidebar-brand { padding: 20px 18px 16px; display: flex; align-items: center; gap: 10px; }
+        .brand-mark { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+        .brand-name { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+        .sidebar-nav { flex: 1; padding: 4px 10px; overflow-y: auto; }
+        .nav-group { padding: 16px 8px 6px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--radius-sm); color: var(--text-muted); font-size: 13.5px; font-weight: 500; cursor: pointer; user-select: none; transition: background 0.1s, color 0.1s; margin-bottom: 1px; }
         .nav-item:hover { background: var(--bg-hover); color: var(--text); }
-        .nav-item.active {
-            background: var(--bg-card);
-            color: var(--text);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
-            padding: 6px 9px;
-        }
-        .nav-item .icon {
-            width: 16px; height: 16px;
-            flex-shrink: 0;
-            color: currentColor;
-        }
-        .nav-badge {
-            margin-left: auto;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-dim);
-            background: var(--bg-hover);
-            padding: 1px 7px;
-            border-radius: 20px;
-            min-width: 20px;
-            text-align: center;
-        }
-        .nav-item.active .nav-badge {
-            background: var(--bg);
-            color: var(--text-muted);
-        }
-
-        .sidebar-footer {
-            padding: 12px 10px;
-            border-top: 1px solid var(--border);
-        }
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 10px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: background 0.1s;
-        }
+        .nav-item.active { background: var(--bg-card); color: var(--text); box-shadow: var(--shadow-sm); border: 1px solid var(--border); padding: 6px 9px; }
+        .nav-item .icon { width: 16px; height: 16px; flex-shrink: 0; }
+        .nav-badge { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--text-dim); background: var(--bg-hover); padding: 1px 7px; border-radius: 20px; min-width: 20px; text-align: center; }
+        .sidebar-footer { padding: 12px 10px; border-top: 1px solid var(--border); }
+        .user-menu { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; }
         .user-menu:hover { background: var(--bg-hover); }
-        .user-avatar {
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-        .user-meta { flex: 1; min-width: 0; }
-        .user-meta strong {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: 1.3;
-        }
-        .user-meta span {
-            font-size: 11.5px;
-            color: var(--text-dim);
-            line-height: 1.3;
-        }
+        .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+        .user-meta strong { display: block; font-size: 13px; font-weight: 500; line-height: 1.3; }
+        .user-meta span { font-size: 11.5px; color: var(--text-dim); }
 
-        /* ============ MAIN ============ */
-        .main {
-            flex: 1;
-            margin-left: 240px;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
+        .main { flex: 1; margin-left: 240px; min-width: 0; display: flex; flex-direction: column; }
+        .topbar { padding: 14px 32px; border-bottom: 1px solid var(--border); background: var(--bg-card); display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 30; }
+        .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+        .topbar h1 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+        .topbar-actions { display: flex; gap: 8px; }
 
-        .topbar {
-            padding: 14px 32px;
-            border-bottom: 1px solid var(--border);
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            position: sticky;
-            top: 0;
-            z-index: 30;
-        }
-        .topbar-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            min-width: 0;
-        }
-        .topbar h1 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.01em;
-        }
-        .topbar-actions { display: flex; gap: 8px; flex-shrink: 0; }
-
-        .page {
-            flex: 1;
-            padding: 32px;
-            max-width: 1280px;
-            width: 100%;
-        }
+        .page { flex: 1; padding: 32px; max-width: 1280px; width: 100%; }
         .page-view { display: none; }
         .page-view.active { display: block; animation: fadeUp 0.2s ease; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 4px; }
+        .page-header p { color: var(--text-muted); font-size: 14px; }
 
-        .page-header {
-            margin-bottom: 28px;
-        }
-        .page-header h2 {
-            font-size: 22px;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            color: var(--text);
-            margin-bottom: 4px;
-        }
-        .page-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); }
 
-        /* ============ CARD ============ */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            gap: 12px;
-        }
-        .card-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-        }
-        .card-header p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* ============ FORM GRID ============ */
-        .form-grid {
-            display: grid;
-            gap: 18px;
-        }
+        .form-grid { display: grid; gap: 18px; }
         .form-row { display: grid; gap: 14px; }
         .form-row-2 { grid-template-columns: 1fr 1fr; }
         .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
-        @media (max-width: 640px) {
-            .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 640px) { .form-row-2, .form-row-3 { grid-template-columns: 1fr; } }
         .form-field { display: flex; flex-direction: column; }
 
-        /* ============ DASHBOARD STATS ============ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
         @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 640px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+        .stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+        .stat:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .stat-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+        .dot-gray { background: #a3a3a3; } .dot-yellow { background: var(--yellow); } .dot-blue { background: var(--blue); } .dot-purple { background: var(--purple); } .dot-green { background: var(--green); }
 
-        .stat {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px;
-            cursor: pointer;
-            transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
-        }
-        .stat:hover {
-            border-color: var(--border-strong);
-            box-shadow: var(--shadow-sm);
-        }
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            font-weight: 500;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .stat-label .dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-        }
-        .stat-value {
-            font-size: 26px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.02em;
-            line-height: 1;
-        }
-        .dot-gray { background: #a3a3a3; }
-        .dot-yellow { background: var(--yellow); }
-        .dot-blue { background: var(--blue); }
-        .dot-purple { background: var(--purple); }
-        .dot-green { background: var(--green); }
-
-        /* ============ DASHBOARD GRID ============ */
-        .dash-grid {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 20px;
-        }
+        .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
         @media (max-width: 1000px) { .dash-grid { grid-template-columns: 1fr; } }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+        .card-header h3 { font-size: 14px; font-weight: 600; }
+        .card-header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 
-        /* ============ RECENT ORDERS ============ */
         .recent-list { display: flex; flex-direction: column; }
-        .recent-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: padding 0.15s;
-        }
+        .recent-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: padding 0.15s; }
         .recent-item:last-child { border-bottom: none; }
         .recent-item:hover { padding-left: 4px; }
         .recent-item:hover .recent-name { color: var(--blue); }
-
-        .recent-icon {
-            width: 36px; height: 36px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            color: var(--text-muted);
-        }
+        .recent-icon { width: 36px; height: 36px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--text-muted); }
         .recent-body { flex: 1; min-width: 0; }
-        .recent-name {
-            font-weight: 500;
-            color: var(--text);
-            font-size: 13.5px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: color 0.15s;
-        }
-        .recent-route {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .recent-id {
-            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-            font-size: 11.5px;
-            color: var(--text-dim);
-            flex-shrink: 0;
-        }
+        .recent-name { font-weight: 500; font-size: 13.5px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; }
+        .recent-route { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* ============ QUICK ACTIONS ============ */
         .qa-list { display: flex; flex-direction: column; gap: 2px; }
-        .qa-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: var(--radius-sm);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            color: var(--text);
-            font-size: 13.5px;
-            font-weight: 500;
-            text-align: left;
-            width: 100%;
-            transition: background 0.1s;
-        }
+        .qa-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-sm); background: transparent; border: none; cursor: pointer; font-family: inherit; color: var(--text); font-size: 13.5px; font-weight: 500; text-align: left; width: 100%; transition: background 0.1s; }
         .qa-item:hover { background: var(--bg-hover); }
-        .qa-icon {
-            width: 30px; height: 30px;
-            border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--bg-subtle);
-            color: var(--text-muted);
-            flex-shrink: 0;
-            border: 1px solid var(--border);
-        }
-        .qa-item:hover .qa-icon { background: var(--bg-card); }
+        .qa-icon { width: 30px; height: 30px; border-radius: 7px; display: flex; align-items: center; justify-content: center; background: var(--bg-subtle); color: var(--text-muted); flex-shrink: 0; border: 1px solid var(--border); }
 
-        /* ============ ORDERS ============ */
-        .filters {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            padding: 4px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            width: fit-content;
-            max-width: 100%;
-        }
-        .filter {
-            padding: 6px 12px;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.12s;
-            white-space: nowrap;
-        }
+        .filters { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; padding: 4px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); width: fit-content; max-width: 100%; }
+        .filter { padding: 6px 12px; background: transparent; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.12s; white-space: nowrap; }
         .filter:hover { color: var(--text); }
-        .filter.active {
-            background: var(--bg-hover);
-            color: var(--text);
-            box-shadow: var(--shadow-sm);
-        }
+        .filter.active { background: var(--bg-hover); color: var(--text); box-shadow: var(--shadow-sm); }
 
-        .orders-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .order-row {
-            display: grid;
-            grid-template-columns: auto 1fr auto auto;
-            align-items: center;
-            gap: 20px;
-            padding: 16px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .order-row:hover {
-            border-color: var(--border-strong);
-            box-shadow: var(--shadow-sm);
-        }
+        .orders-list { display: flex; flex-direction: column; gap: 8px; }
+        .order-row { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 20px; padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.15s; }
+        .order-row:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
         .order-row-main { min-width: 0; }
-        .order-row-name {
-            font-weight: 500;
-            color: var(--text);
-            font-size: 14px;
-            margin-bottom: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .order-row-route {
-            font-size: 12.5px;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .order-row-id {
-            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-            font-size: 11.5px;
-            color: var(--text-dim);
-        }
-        .order-row-meta {
-            display: flex;
-            gap: 16px;
-            font-size: 12.5px;
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-        .order-row-meta span { display: flex; align-items: center; gap: 4px; }
+        .order-row-name { font-weight: 500; font-size: 14px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-row-route { font-size: 12.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .order-row-id { font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--text-dim); }
+        .order-row-meta { display: flex; gap: 16px; font-size: 12.5px; color: var(--text-muted); flex-shrink: 0; }
 
-        @media (max-width: 900px) {
-            .order-row {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            .order-row-meta {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-        }
+        .status { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 500; white-space: nowrap; border: 1px solid; }
+        .status .sdot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-created { background: #fafafa; color: #525252; border-color: #e5e5e5; } .status-created .sdot { background: #a3a3a3; }
+        .status-awaiting_phone { background: #fffbeb; color: #92400e; border-color: #fde68a; } .status-awaiting_phone .sdot { background: #f59e0b; }
+        .status-awaiting_form { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; } .status-awaiting_form .sdot { background: #3b82f6; }
+        .status-awaiting_docs { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; } .status-awaiting_docs .sdot { background: #8b5cf6; }
+        .status-completed { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; } .status-completed .sdot { background: #10b981; }
+        .status-cancelled { background: #fef2f2; color: #991b1b; border-color: #fecaca; } .status-cancelled .sdot { background: #ef4444; }
 
-        /* ============ STATUS ============ */
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 9px;
-            border-radius: 6px;
-            font-size: 11.5px;
-            font-weight: 500;
-            white-space: nowrap;
-            border: 1px solid;
-            line-height: 1.4;
-        }
-        .status .sdot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-        }
-        .status-created { background: #fafafa; color: #525252; border-color: #e5e5e5; }
-        .status-created .sdot { background: #a3a3a3; }
-        .status-awaiting_phone { background: #fffbeb; color: #92400e; border-color: #fde68a; }
-        .status-awaiting_phone .sdot { background: #f59e0b; }
-        .status-awaiting_form { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
-        .status-awaiting_form .sdot { background: #3b82f6; }
-        .status-awaiting_docs { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
-        .status-awaiting_docs .sdot { background: #8b5cf6; }
-        .status-completed { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
-        .status-completed .sdot { background: #10b981; }
-        .status-cancelled { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-        .status-cancelled .sdot { background: #ef4444; }
+        .link-box { margin-top: 20px; padding: 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius); }
+        .link-box-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
+        .link-box-value { font-family: ui-monospace, monospace; font-size: 12.5px; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; word-break: break-all; }
 
-        /* ============ LINK BOX ============ */
-        .link-box {
-            margin-top: 20px;
-            padding: 16px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-        .link-box-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .link-box-value {
-            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-            font-size: 12.5px;
-            color: var(--text);
-            word-break: break-all;
-            padding: 10px 12px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-
-        /* ============ MODAL ============ */
-        .modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(15,15,15,0.4);
-            backdrop-filter: blur(2px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            z-index: 100;
-        }
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15,15,15,0.4); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 100; }
         .modal-backdrop.show { display: flex; }
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            max-width: 640px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: var(--bg-card);
-            z-index: 1;
-        }
-        .modal-header h2 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-            letter-spacing: -0.01em;
-        }
-        .modal-header .id {
-            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 400;
-            margin-left: 8px;
-        }
-        .modal-close {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 4px 8px;
-            line-height: 1;
-            border-radius: 6px;
-            transition: background 0.1s;
-        }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
+        .modal-header h2 { font-size: 15px; font-weight: 600; }
+        .modal-header .id { font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-dim); font-weight: 400; margin-left: 8px; }
+        .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; padding: 4px 8px; line-height: 1; border-radius: 6px; }
         .modal-close:hover { background: var(--bg-hover); color: var(--text); }
         .modal-body { padding: 24px; }
-        .modal-actions {
-            padding: 16px 24px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            background: var(--bg-subtle);
-            border-radius: 0 0 14px 14px;
-            align-items: center;
-        }
+        .modal-actions { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; background: var(--bg-subtle); border-radius: 0 0 14px 14px; align-items: center; }
 
         .detail-block { margin-bottom: 24px; }
         .detail-block:last-child { margin-bottom: 0; }
-        .detail-block h4 {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-        .detail-list { display: flex; flex-direction: column; gap: 0; }
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 9px 0;
-            font-size: 13.5px;
-            gap: 16px;
-            border-bottom: 1px solid var(--border);
-        }
+        .detail-block h4 { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .detail-item { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13.5px; gap: 16px; border-bottom: 1px solid var(--border); }
         .detail-item:last-child { border-bottom: none; }
         .detail-item .k { color: var(--text-muted); flex-shrink: 0; }
-        .detail-item .v {
-            color: var(--text);
-            text-align: right;
-            word-break: break-word;
-            min-width: 0;
-            font-weight: 500;
-        }
+        .detail-item .v { text-align: right; word-break: break-word; min-width: 0; font-weight: 500; }
 
         .check-list { display: flex; flex-direction: column; gap: 8px; }
-        .check-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13.5px;
-            color: var(--text);
-        }
-        .check-row .cicon {
-            width: 18px; height: 18px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-        }
+        .check-row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+        .check-row .cicon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
         .check-row.yes .cicon { background: var(--green); }
         .check-row.no .cicon { background: var(--red); }
         .check-row.no { color: var(--text-muted); }
 
-        .comment-box {
-            margin-top: 12px;
-            padding: 12px 14px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 13.5px;
-            color: var(--text);
-            line-height: 1.55;
-        }
-        .comment-box .label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 4px;
-        }
+        .comment-box { margin-top: 12px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; }
+        .comment-box .label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
 
-        /* ============ PLACEHOLDER PAGES ============ */
-        .placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 24px;
-            text-align: center;
-            color: var(--text-muted);
-        }
-        .placeholder-icon {
-            width: 56px; height: 56px;
-            border-radius: 14px;
-            background: var(--bg-subtle);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-dim);
-            margin-bottom: 20px;
-        }
-        .placeholder h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-        .placeholder p {
-            font-size: 13.5px;
-            max-width: 380px;
-            line-height: 1.55;
-        }
+        .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; color: var(--text-muted); }
+        .placeholder-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--bg-subtle); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dim); margin-bottom: 20px; }
+        .placeholder h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .placeholder p { font-size: 13.5px; max-width: 380px; line-height: 1.55; }
 
-        /* ============ TOASTS ============ */
-        .toasts {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 200;
-        }
-        .toast {
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            background: var(--text);
-            color: #fff;
-            font-size: 13.5px;
-            font-weight: 500;
-            box-shadow: var(--shadow-lg);
-            animation: toastIn 0.2s ease;
-            max-width: 340px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .toast.success { background: #065f46; }
-        .toast.error { background: #991b1b; }
-        @keyframes toastIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        .toasts { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
+        .toast { padding: 12px 16px; border-radius: var(--radius-sm); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 500; box-shadow: var(--shadow-lg); animation: toastIn 0.2s ease; max-width: 340px; }
+        .toast.success { background: #065f46; } .toast.error { background: #991b1b; }
+        @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* ============ MISC ============ */
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-            font-size: 13.5px;
-        }
-        .spinner {
-            display: inline-block;
-            width: 12px; height: 12px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
+        .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 13.5px; }
+        .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #phone-input {
-            font-family: ui-monospace, 'SF Mono', Monaco, monospace;
-            letter-spacing: 0.02em;
-            font-variant-numeric: tabular-nums;
-        }
+        #phone-input { font-family: ui-monospace, monospace; letter-spacing: 0.02em; }
         #phone-input.valid { border-color: var(--green); }
-        #phone-input.valid:focus { box-shadow: 0 0 0 3px rgba(5,150,105,0.1); }
         #phone-input.invalid { border-color: var(--red); }
 
-        .mobile-toggle {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            cursor: pointer;
-            padding: 4px;
-        }
+        .mobile-toggle { display: none; background: transparent; border: none; color: var(--text); cursor: pointer; padding: 4px; }
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); transition: transform 0.2s; }
             .sidebar.open { transform: translateX(0); }
             .main { margin-left: 0; }
             .mobile-toggle { display: flex; }
-            .topbar { padding-left: 16px; padding-right: 16px; }
-            .page { padding: 20px 16px; }
+            .topbar, .page { padding-left: 16px; padding-right: 16px; }
+            .order-row { grid-template-columns: 1fr; gap: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ============ LOGIN ============ -->
     <div class="login-screen" id="login-screen">
         <div class="login-card">
             <div class="login-logo">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16.5 9.4 7.55 4.24"/>
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                    <polyline points="3.29 7 12 12 20.71 7"/>
-                    <line x1="12" y1="22" x2="12" y2="12"/>
-                </svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
             </div>
             <h1>Вход в систему</h1>
             <p>Введите пароль администратора</p>
             <div class="login-form">
-                <div>
-                    <label for="password-input">Пароль</label>
-                    <input type="password" id="password-input" placeholder="••••••••" autocomplete="current-password">
-                </div>
+                <div><label for="password-input">Пароль</label><input type="password" id="password-input" placeholder="••••••••"></div>
                 <button class="btn btn-primary btn-block" id="login-btn" style="padding:11px;">Войти</button>
             </div>
         </div>
     </div>
 
-    <!-- ============ APP ============ -->
     <div class="app" id="app" style="display:none;">
-
-        <!-- === SIDEBAR === -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
-                <div class="brand-mark">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16.5 9.4 7.55 4.24"/>
-                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        <polyline points="3.29 7 12 12 20.71 7"/>
-                        <line x1="12" y1="22" x2="12" y2="12"/>
-                    </svg>
-                </div>
+                <div class="brand-mark"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></div>
                 <div class="brand-name">Cargo</div>
             </div>
-
             <nav class="sidebar-nav">
                 <div class="nav-group">Основное</div>
-                <div class="nav-item active" data-page="dashboard">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-                    <span>Главная</span>
-                </div>
-                <div class="nav-item" data-page="create">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>Создать заказ</span>
-                </div>
-                <div class="nav-item" data-page="orders">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
-                    <span>Заказы</span>
-                    <span class="nav-badge" id="orders-badge">0</span>
-                </div>
-
+                <div class="nav-item active" data-page="dashboard"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Главная</span></div>
+                <div class="nav-item" data-page="create"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span>Создать заказ</span></div>
+                <div class="nav-item" data-page="orders"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg><span>Заказы</span><span class="nav-badge" id="orders-badge">0</span></div>
                 <div class="nav-group">Документы</div>
-                <div class="nav-item" data-page="docs">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-                    <span>Документы</span>
-                </div>
-                <div class="nav-item" data-page="archive">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
-                    <span>Архив</span>
-                </div>
-
+                <div class="nav-item" data-page="docs"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Документы</span></div>
+                <div class="nav-item" data-page="archive"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/></svg><span>Архив</span></div>
                 <div class="nav-group">Система</div>
-                <div class="nav-item" data-page="settings">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>Настройки</span>
-                </div>
+                <div class="nav-item" data-page="settings"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Настройки</span></div>
             </nav>
-
             <div class="sidebar-footer">
                 <div class="user-menu" id="logout-btn" title="Выйти">
                     <div class="user-avatar">A</div>
-                    <div class="user-meta">
-                        <strong>Администратор</strong>
-                        <span>Диспетчер</span>
-                    </div>
+                    <div class="user-meta"><strong>Администратор</strong><span>Диспетчер</span></div>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-dim);"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 </div>
             </div>
         </aside>
 
-        <!-- === MAIN === -->
         <main class="main">
             <header class="topbar">
                 <div class="topbar-left">
-                    <button class="mobile-toggle" id="mobile-toggle">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                    </button>
+                    <button class="mobile-toggle" id="mobile-toggle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
                     <h1 id="topbar-title">Главная</h1>
                 </div>
                 <div class="topbar-actions">
-                    <button class="btn btn-ghost btn-sm" id="refresh-btn">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                        Обновить
-                    </button>
+                    <button class="btn btn-ghost btn-sm" id="refresh-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Обновить</button>
                 </div>
             </header>
 
             <div class="page">
-
-                <!-- ============ DASHBOARD ============ -->
                 <section class="page-view active" data-view="dashboard">
-                    <div class="page-header">
-                        <h2>Обзор</h2>
-                        <p>Сводка по текущим заказам и активности</p>
-                    </div>
-
+                    <div class="page-header"><h2>Обзор</h2><p>Сводка по текущим заказам и активности</p></div>
                     <div class="stats-grid">
-                        <div class="stat" data-goto-status="">
-                            <div class="stat-label">Всего <span class="dot dot-gray"></span></div>
-                            <div class="stat-value" id="stat-total">0</div>
-                        </div>
-                        <div class="stat" data-goto-status="awaiting_phone">
-                            <div class="stat-label">Ждут номер <span class="dot dot-yellow"></span></div>
-                            <div class="stat-value" id="stat-phone">0</div>
-                        </div>
-                        <div class="stat" data-goto-status="awaiting_form">
-                            <div class="stat-label">Ждут форму <span class="dot dot-blue"></span></div>
-                            <div class="stat-value" id="stat-form">0</div>
-                        </div>
-                        <div class="stat" data-goto-status="awaiting_docs">
-                            <div class="stat-label">Ждут док-ты <span class="dot dot-purple"></span></div>
-                            <div class="stat-value" id="stat-docs">0</div>
-                        </div>
-                        <div class="stat" data-goto-status="completed">
-                            <div class="stat-label">Завершено <span class="dot dot-green"></span></div>
-                            <div class="stat-value" id="stat-done">0</div>
-                        </div>
+                        <div class="stat" data-goto-status=""><div class="stat-label">Всего <span class="dot dot-gray"></span></div><div class="stat-value" id="stat-total">0</div></div>
+                        <div class="stat" data-goto-status="awaiting_phone"><div class="stat-label">Ждут номер <span class="dot dot-yellow"></span></div><div class="stat-value" id="stat-phone">0</div></div>
+                        <div class="stat" data-goto-status="awaiting_form"><div class="stat-label">Ждут форму <span class="dot dot-blue"></span></div><div class="stat-value" id="stat-form">0</div></div>
+                        <div class="stat" data-goto-status="awaiting_docs"><div class="stat-label">Ждут док-ты <span class="dot dot-purple"></span></div><div class="stat-value" id="stat-docs">0</div></div>
+                        <div class="stat" data-goto-status="completed"><div class="stat-label">Завершено <span class="dot dot-green"></span></div><div class="stat-value" id="stat-done">0</div></div>
                     </div>
-
                     <div class="dash-grid">
                         <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <h3>Последние заказы</h3>
-                                    <p>Пять самых свежих</p>
-                                </div>
-                                <button class="btn btn-ghost btn-sm" data-goto="orders">Все →</button>
-                            </div>
+                            <div class="card-header"><div><h3>Последние заказы</h3><p>Пять самых свежих</p></div><button class="btn btn-ghost btn-sm" data-goto="orders">Все →</button></div>
                             <div id="recent-list" class="recent-list"></div>
                         </div>
-
                         <div class="card">
-                            <div class="card-header">
-                                <div>
-                                    <h3>Быстрые действия</h3>
-                                    <p>Часто используемое</p>
-                                </div>
-                            </div>
+                            <div class="card-header"><div><h3>Быстрые действия</h3></div></div>
                             <div class="qa-list">
-                                <button class="qa-item" data-goto="create">
-                                    <div class="qa-icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    </div>
-                                    Создать заказ
-                                </button>
-                                <button class="qa-item" data-goto="orders">
-                                    <div class="qa-icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                                    </div>
-                                    Все заказы
-                                </button>
-                                <button class="qa-item" data-goto="docs">
-                                    <div class="qa-icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                    </div>
-                                    Документы
-                                </button>
-                                <button class="qa-item" data-goto="settings">
-                                    <div class="qa-icon">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                                    </div>
-                                    Настройки
-                                </button>
+                                <button class="qa-item" data-goto="create"><div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>Создать заказ</button>
+                                <button class="qa-item" data-goto="orders"><div class="qa-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div>Все заказы</button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- ============ CREATE ============ -->
                 <section class="page-view" data-view="create">
-                    <div class="page-header">
-                        <h2>Новый заказ</h2>
-                        <p>Заполните данные — система сформирует ссылку для водителя</p>
-                    </div>
-
+                    <div class="page-header"><h2>Новый заказ</h2><p>Заполните данные — система сформирует ссылку для водителя</p></div>
                     <div style="max-width:720px;">
                         <div class="card">
                             <form id="create-form" class="form-grid">
-                                <div class="form-field">
-                                    <label>Наименование груза <span class="req">*</span></label>
-                                    <input type="text" name="cargo_name" placeholder="Например: Coca-Cola, паллеты" required>
-                                </div>
-
+                                <div class="form-field"><label>Наименование груза <span class="req">*</span></label><input type="text" name="cargo_name" placeholder="Например: Coca-Cola, паллеты" required></div>
                                 <div class="form-row form-row-2">
-                                    <div class="form-field">
-                                        <label>Вес, кг <span class="req">*</span></label>
-                                        <input type="number" name="weight" placeholder="1200" step="0.1" min="0.1" required>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Мест, шт <span class="req">*</span></label>
-                                        <input type="number" name="places" placeholder="24" step="1" min="1" required>
-                                    </div>
+                                    <div class="form-field"><label>Вес, кг <span class="req">*</span></label><input type="number" name="weight" placeholder="1200" step="0.1" min="0.1" required></div>
+                                    <div class="form-field"><label>Мест, шт <span class="req">*</span></label><input type="number" name="places" placeholder="24" step="1" min="1" required></div>
                                 </div>
-
                                 <div class="form-row form-row-3">
-                                    <div class="form-field">
-                                        <label>Длина, см</label>
-                                        <input type="number" name="length" placeholder="120" step="1" min="1">
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Ширина, см</label>
-                                        <input type="number" name="width" placeholder="80" step="1" min="1">
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Высота, см</label>
-                                        <input type="number" name="height" placeholder="100" step="1" min="1">
-                                    </div>
+                                    <div class="form-field"><label>Длина, см</label><input type="number" name="length" placeholder="120" step="1" min="1"></div>
+                                    <div class="form-field"><label>Ширина, см</label><input type="number" name="width" placeholder="80" step="1" min="1"></div>
+                                    <div class="form-field"><label>Высота, см</label><input type="number" name="height" placeholder="100" step="1" min="1"></div>
                                 </div>
-
                                 <div class="form-row form-row-2">
-                                    <div class="form-field">
-                                        <label>Откуда <span class="req">*</span></label>
-                                        <input type="text" name="from" placeholder="Москва, склад №5" required>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Куда <span class="req">*</span></label>
-                                        <input type="text" name="to" placeholder="СПб, ТК Лента" required>
-                                    </div>
+                                    <div class="form-field"><label>Откуда <span class="req">*</span></label><input type="text" name="from" placeholder="Москва, склад №5" required></div>
+                                    <div class="form-field"><label>Куда <span class="req">*</span></label><input type="text" name="to" placeholder="СПб, ТК Лента" required></div>
                                 </div>
-
                                 <div class="form-row form-row-2">
-                                    <div class="form-field">
-                                        <label>Дата отправки <span class="req">*</span></label>
-                                        <input type="date" name="ship_date" required>
-                                    </div>
-                                    <div class="form-field">
-                                        <label>Телефон водителя <span class="req">*</span></label>
-                                        <input
-                                            type="tel"
-                                            name="phone_expected"
-                                            id="phone-input"
-                                            placeholder="+7 (___) ___-__-__"
-                                            inputmode="tel"
-                                            autocomplete="off"
-                                            maxlength="18"
-                                            required
-                                        >
-                                    </div>
+                                    <div class="form-field"><label>Дата отправки <span class="req">*</span></label><input type="date" name="ship_date" required></div>
+                                    <div class="form-field"><label>Телефон водителя <span class="req">*</span></label><input type="tel" name="phone_expected" id="phone-input" placeholder="+7 (___) ___-__-__" inputmode="tel" autocomplete="off" maxlength="18" required></div>
                                 </div>
-
                                 <div style="display:flex; gap:8px; margin-top:4px;">
-                                    <button type="submit" class="btn btn-primary" id="create-btn">
-                                        Создать заказ
-                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="create-btn">Создать заказ</button>
                                     <button type="button" class="btn btn-secondary" id="create-reset">Очистить</button>
                                 </div>
                             </form>
-
                             <div id="link-result"></div>
                         </div>
                     </div>
                 </section>
 
-                <!-- ============ ORDERS ============ -->
                 <section class="page-view" data-view="orders">
-                    <div class="page-header">
-                        <h2>Заказы</h2>
-                        <p>Все заказы в системе</p>
-                    </div>
-
+                    <div class="page-header"><h2>Заказы</h2><p>Все заказы в системе</p></div>
                     <div class="filters">
                         <button class="filter active" data-status="">Все</button>
                         <button class="filter" data-status="created">Создан</button>
@@ -1218,83 +323,27 @@
                         <button class="filter" data-status="completed">Завершён</button>
                         <button class="filter" data-status="cancelled">Отменён</button>
                     </div>
-
-                    <div class="orders-list" id="orders-list">
-                        <div class="empty">Загрузка...</div>
-                    </div>
+                    <div class="orders-list" id="orders-list"><div class="empty">Загрузка...</div></div>
                 </section>
 
-                <!-- ============ DOCS (placeholder) ============ -->
                 <section class="page-view" data-view="docs">
-                    <div class="page-header">
-                        <h2>Документы</h2>
-                        <p>Накладные, ТТН и акты осмотра</p>
-                    </div>
-
-                    <div class="card">
-                        <div class="placeholder">
-                            <div class="placeholder-icon">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                    <polyline points="14 2 14 8 20 8"/>
-                                    <line x1="16" y1="13" x2="8" y2="13"/>
-                                    <line x1="16" y1="17" x2="8" y2="17"/>
-                                </svg>
-                            </div>
-                            <h3>Раздел в разработке</h3>
-                            <p>Здесь появятся все документы, привязанные к заказам: накладные, ТТН, акты осмотра и доверенности.</p>
-                        </div>
-                    </div>
+                    <div class="page-header"><h2>Документы</h2><p>Накладные, ТТН и акты осмотра</p></div>
+                    <div class="card"><div class="placeholder"><div class="placeholder-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Раздел в разработке</h3><p>Здесь появится реестр сгенерированных документов. Пока генерируйте акты из карточки заказа.</p></div></div>
                 </section>
 
-                <!-- ============ ARCHIVE (placeholder) ============ -->
                 <section class="page-view" data-view="archive">
-                    <div class="page-header">
-                        <h2>Архив</h2>
-                        <p>Завершённые заказы старше 30 дней</p>
-                    </div>
-
-                    <div class="card">
-                        <div class="placeholder">
-                            <div class="placeholder-icon">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="21 8 21 21 3 21 3 8"/>
-                                    <rect x="1" y="3" width="22" height="5" rx="1"/>
-                                    <line x1="10" y1="12" x2="14" y2="12"/>
-                                </svg>
-                            </div>
-                            <h3>Раздел в разработке</h3>
-                            <p>Здесь будут храниться завершённые заказы для истории и аудита.</p>
-                        </div>
-                    </div>
+                    <div class="page-header"><h2>Архив</h2><p>Завершённые заказы старше 30 дней</p></div>
+                    <div class="card"><div class="placeholder"><div class="placeholder-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/></svg></div><h3>Раздел в разработке</h3><p>Здесь будут храниться завершённые заказы для истории и аудита.</p></div></div>
                 </section>
 
-                <!-- ============ SETTINGS (placeholder) ============ -->
                 <section class="page-view" data-view="settings">
-                    <div class="page-header">
-                        <h2>Настройки</h2>
-                        <p>Параметры системы и интеграции</p>
-                    </div>
-
-                    <div class="card">
-                        <div class="placeholder">
-                            <div class="placeholder-icon">
-                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-                                </svg>
-                            </div>
-                            <h3>Раздел в разработке</h3>
-                            <p>Здесь будут управление интеграцией с MAX, уведомления, шаблоны сообщений и параметры аккаунта.</p>
-                        </div>
-                    </div>
+                    <div class="page-header"><h2>Настройки</h2><p>Параметры системы и интеграции</p></div>
+                    <div class="card"><div class="placeholder"><div class="placeholder-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><h3>Раздел в разработке</h3><p>Здесь будут управление интеграцией с MAX, уведомления и параметры аккаунта.</p></div></div>
                 </section>
-
             </div>
         </main>
     </div>
 
-    <!-- ============ MODAL ============ -->
     <div class="modal-backdrop" id="modal">
         <div class="modal">
             <div class="modal-header">
@@ -1309,25 +358,16 @@
     <div class="toasts" id="toasts"></div>
 
     <script>
-        // ============ CONFIG ============
         const API_BASE = '';
         const STORAGE_KEY = 'cargo_admin_password';
-
-        const PAGE_TITLES = {
-            dashboard: 'Главная',
-            create: 'Новый заказ',
-            orders: 'Заказы',
-            docs: 'Документы',
-            archive: 'Архив',
-            settings: 'Настройки',
-        };
+        const PAGE_TITLES = { dashboard: 'Главная', create: 'Новый заказ', orders: 'Заказы', docs: 'Документы', archive: 'Архив', settings: 'Настройки' };
 
         let password = localStorage.getItem(STORAGE_KEY) || '';
         let currentFilter = '';
         let allOrders = [];
         let currentPage = 'dashboard';
+        let currentOrderId = null;
 
-        // ============ HELPERS ============
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
 
@@ -1341,52 +381,26 @@
 
         function esc(str) {
             if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function api(path, options = {}) {
             return fetch(API_BASE + path, {
                 ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Admin-Password': password,
-                    ...(options.headers || {}),
-                },
+                headers: { 'Content-Type': 'application/json', 'X-Admin-Password': password, ...(options.headers || {}) },
             });
         }
 
-        const STATUS_LABELS = {
-            created: 'Создан',
-            awaiting_phone: 'Ждём номер',
-            awaiting_form: 'Ждём форму',
-            awaiting_docs: 'Ждём документы',
-            completed: 'Завершён',
-            cancelled: 'Отменён',
-        };
+        const STATUS_LABELS = { created: 'Создан', awaiting_phone: 'Ждём номер', awaiting_form: 'Ждём форму', awaiting_docs: 'Ждём документы', completed: 'Завершён', cancelled: 'Отменён' };
+        function statusBadge(s) { return `<span class="status status-${s}"><span class="sdot"></span>${STATUS_LABELS[s] || s}</span>`; }
+        function fmtDate(iso) { if (!iso) return '—'; return new Date(iso).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
 
-        function statusBadge(s) {
-            return `<span class="status status-${s}"><span class="sdot"></span>${STATUS_LABELS[s] || s}</span>`;
-        }
-
-        function fmtDate(iso) {
-            if (!iso) return '—';
-            return new Date(iso).toLocaleString('ru-RU', {
-                day: '2-digit', month: '2-digit', year: 'numeric',
-                hour: '2-digit', minute: '2-digit',
-            });
-        }
-
-        // ============ NAVIGATION ============
         function gotoPage(name) {
             if (!PAGE_TITLES[name]) return;
             currentPage = name;
-
             $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === name));
             $$('.page-view').forEach(el => el.classList.toggle('active', el.dataset.view === name));
             $('#topbar-title').textContent = PAGE_TITLES[name];
-
             if (name === 'orders' || name === 'dashboard') loadOrders();
             $('#sidebar').classList.remove('open');
         }
@@ -1403,53 +417,31 @@
             });
         });
 
-        // ============ AUTH ============
-        function showLogin() {
-            $('#login-screen').style.display = 'flex';
-            $('#app').style.display = 'none';
-            $('#password-input').focus();
-        }
-        function showApp() {
-            $('#login-screen').style.display = 'none';
-            $('#app').style.display = 'flex';
-            gotoPage('dashboard');
-        }
+        function showLogin() { $('#login-screen').style.display = 'flex'; $('#app').style.display = 'none'; $('#password-input').focus(); }
+        function showApp() { $('#login-screen').style.display = 'none'; $('#app').style.display = 'flex'; gotoPage('dashboard'); }
 
         $('#login-btn').addEventListener('click', async () => {
             const pwd = $('#password-input').value.trim();
             if (!pwd) return toast('Введите пароль', 'error');
             password = pwd;
             const res = await api('/api/orders');
-            if (res.ok) {
-                localStorage.setItem(STORAGE_KEY, pwd);
-                showApp();
-                toast('Добро пожаловать!', 'success');
-            } else {
-                password = '';
-                localStorage.removeItem(STORAGE_KEY);
-                toast('Неверный пароль', 'error');
-            }
+            if (res.ok) { localStorage.setItem(STORAGE_KEY, pwd); showApp(); toast('Добро пожаловать!', 'success'); }
+            else { password = ''; localStorage.removeItem(STORAGE_KEY); toast('Неверный пароль', 'error'); }
         });
-        $('#password-input').addEventListener('keydown', e => {
-            if (e.key === 'Enter') $('#login-btn').click();
-        });
+        $('#password-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('#login-btn').click(); });
         $('#logout-btn').addEventListener('click', () => {
             if (!confirm('Выйти из системы?')) return;
-            password = '';
-            localStorage.removeItem(STORAGE_KEY);
-            showLogin();
+            password = ''; localStorage.removeItem(STORAGE_KEY); showLogin();
         });
-
         $('#mobile-toggle').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
         $('#refresh-btn').addEventListener('click', () => { loadOrders(); toast('Обновлено'); });
 
-        // ============ PHONE MASK ============
+        // ============ ТЕЛЕФОН ============
         const today = new Date().toISOString().split('T')[0];
         document.querySelector('input[name="ship_date"]').value = today;
         document.querySelector('input[name="ship_date"]').min = today;
 
         const phoneInput = document.getElementById('phone-input');
-
         function formatPhone(raw) {
             let d = String(raw).replace(/\D/g, '');
             if (d.startsWith('8') || d.startsWith('7')) d = d.slice(1);
@@ -1461,10 +453,7 @@
             if (d.length >= 8) r += '-' + d.slice(8, 10);
             return r;
         }
-        function isPhoneComplete(raw) {
-            return String(raw).replace(/\D/g, '').length === 11;
-        }
-
+        function isPhoneComplete(raw) { return String(raw).replace(/\D/g, '').length === 11; }
         phoneInput.addEventListener('input', e => {
             const atEnd = e.target.selectionStart === e.target.value.length;
             const f = formatPhone(e.target.value);
@@ -1480,11 +469,8 @@
             phoneInput.value = formatPhone((e.clipboardData || window.clipboardData).getData('text'));
             phoneInput.dispatchEvent(new Event('input'));
         });
-        phoneInput.addEventListener('blur', () => {
-            if (!isPhoneComplete(phoneInput.value)) phoneInput.classList.remove('valid', 'invalid');
-        });
 
-        // ============ CREATE ORDER ============
+        // ============ СОЗДАНИЕ ============
         $('#create-reset').addEventListener('click', () => {
             $('#create-form').reset();
             document.querySelector('input[name="ship_date"]').value = today;
@@ -1497,25 +483,12 @@
             const btn = $('#create-btn');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Создание...';
-
             const fd = new FormData(e.target);
             const payload = {
-                cargo: {
-                    name: fd.get('cargo_name'),
-                    weight: parseFloat(fd.get('weight')),
-                    places: parseInt(fd.get('places'), 10),
-                    length: parseFloat(fd.get('length')) || 0,
-                    width: parseFloat(fd.get('width')) || 0,
-                    height: parseFloat(fd.get('height')) || 0,
-                },
-                route: {
-                    from: fd.get('from'),
-                    to: fd.get('to'),
-                    ship_date: fd.get('ship_date'),
-                },
+                cargo: { name: fd.get('cargo_name'), weight: parseFloat(fd.get('weight')), places: parseInt(fd.get('places'), 10), length: parseFloat(fd.get('length')) || 0, width: parseFloat(fd.get('width')) || 0, height: parseFloat(fd.get('height')) || 0 },
+                route: { from: fd.get('from'), to: fd.get('to'), ship_date: fd.get('ship_date') },
                 loader: { phone_expected: fd.get('phone_expected').replace(/\D/g, '') },
             };
-
             try {
                 const res = await api('/api/orders', { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
@@ -1530,30 +503,19 @@
                     const msg = result.details ? result.details.join('; ') : (result.error || 'Ошибка');
                     toast(msg, 'error');
                 }
-            } catch {
-                toast('Ошибка сети', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Создать заказ';
-            }
+            } catch { toast('Ошибка сети', 'error'); }
+            finally { btn.disabled = false; btn.textContent = 'Создать заказ'; }
         });
 
         function showLinkBox(result) {
             const link = result.loader_link;
             if (!link) {
-                $('#link-result').innerHTML = `
-                    <div class="link-box">
-                        <div class="link-box-label">Ссылка не сгенерирована</div>
-                        <div style="font-size:13px;color:var(--red);">Проверьте переменную BOT_USERNAME на Vercel</div>
-                    </div>`;
+                $('#link-result').innerHTML = `<div class="link-box"><div class="link-box-label">Ссылка не сгенерирована</div><div style="font-size:13px;color:var(--red);">Проверьте переменную BOT_USERNAME на Vercel</div></div>`;
                 return;
             }
             $('#link-result').innerHTML = `
                 <div class="link-box">
-                    <div class="link-box-label">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        Ссылка для водителя · ${esc(result.order.id)}
-                    </div>
+                    <div class="link-box-label">Ссылка для водителя · ${esc(result.order.id)}</div>
                     <div class="link-box-value">${esc(link)}</div>
                     <button class="btn btn-primary btn-sm" id="copy-link">Скопировать</button>
                 </div>`;
@@ -1565,7 +527,7 @@
             });
         }
 
-        // ============ ORDERS LIST ============
+        // ============ СПИСОК ============
         async function loadOrders() {
             if (!password) return;
             try {
@@ -1574,23 +536,17 @@
                 if (res.status === 401) { showLogin(); return; }
                 const data = await res.json();
                 allOrders = data.orders || [];
-                renderOrders();
-                renderStats();
-                renderRecent();
-            } catch {
-                $('#orders-list').innerHTML = '<div class="empty">Ошибка загрузки</div>';
-            }
+                renderOrders(); renderStats(); renderRecent();
+            } catch { $('#orders-list').innerHTML = '<div class="empty">Ошибка загрузки</div>'; }
         }
 
         function renderOrders() {
             const badge = $('#orders-badge');
             if (badge) badge.textContent = allOrders.length;
-
             if (!allOrders.length) {
                 $('#orders-list').innerHTML = `<div class="empty">Пока нет заказов${currentFilter ? ' в этом статусе' : ''}</div>`;
                 return;
             }
-
             $('#orders-list').innerHTML = allOrders.map(o => `
                 <div class="order-row" data-id="${esc(o.id)}">
                     <div class="order-row-id">${esc(o.id)}</div>
@@ -1606,7 +562,6 @@
                     <div>${statusBadge(o.status)}</div>
                 </div>
             `).join('');
-
             $$('.order-row').forEach(el => el.addEventListener('click', () => openOrder(el.dataset.id)));
         }
 
@@ -1622,26 +577,17 @@
 
         function renderRecent() {
             const recent = allOrders.slice(0, 5);
-            if (!recent.length) {
-                $('#recent-list').innerHTML = '<div class="empty" style="padding:40px 0;">Заказов пока нет</div>';
-                return;
-            }
+            if (!recent.length) { $('#recent-list').innerHTML = '<div class="empty" style="padding:40px 0;">Заказов пока нет</div>'; return; }
             $('#recent-list').innerHTML = recent.map(o => `
                 <div class="recent-item" data-id="${esc(o.id)}">
-                    <div class="recent-icon">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    </div>
-                    <div class="recent-body">
-                        <div class="recent-name">${esc(o.cargo.name || '—')}</div>
-                        <div class="recent-route">${esc(o.route.from || '—')} → ${esc(o.route.to || '—')}</div>
-                    </div>
+                    <div class="recent-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                    <div class="recent-body"><div class="recent-name">${esc(o.cargo.name || '—')}</div><div class="recent-route">${esc(o.route.from || '—')} → ${esc(o.route.to || '—')}</div></div>
                     ${statusBadge(o.status)}
                 </div>
             `).join('');
             $$('.recent-item').forEach(el => el.addEventListener('click', () => openOrder(el.dataset.id)));
         }
 
-        // ============ FILTERS ============
         $$('.filter').forEach(chip => {
             chip.addEventListener('click', () => {
                 $$('.filter').forEach(c => c.classList.remove('active'));
@@ -1651,16 +597,24 @@
             });
         });
 
-        // ============ ORDER MODAL ============
+        // ============ МОДАЛКА ============
         function openOrder(id) {
             const o = allOrders.find(x => x.id === id);
             if (!o) return;
+            currentOrderId = id;
             $('#modal-id').textContent = o.id;
             $('#modal-body').innerHTML = renderDetail(o);
             $('#modal-actions').innerHTML = renderActions(o);
             $('#modal').classList.add('show');
+            bindModalActions(o);
+        }
+
+        function bindModalActions(o) {
             $$('#modal-actions button[data-action]').forEach(btn => {
-                btn.addEventListener('click', () => handleAction(o, btn.dataset.action));
+                btn.addEventListener('click', (ev) => {
+                    ev.preventDefault();
+                    handleAction(o, btn.dataset.action);
+                });
             });
         }
 
@@ -1669,46 +623,29 @@
             const i = o.inspection;
 
             let h = `
-                <div class="detail-block">
-                    <h4>Статус</h4>
-                    <div>${statusBadge(o.status)}</div>
+                <div class="detail-block"><h4>Статус</h4><div>${statusBadge(o.status)}</div></div>
+                <div class="detail-block"><h4>Груз</h4>
+                    <div class="detail-item"><span class="k">Наименование</span><span class="v">${esc(o.cargo.name)}</span></div>
+                    <div class="detail-item"><span class="k">Вес</span><span class="v">${o.cargo.weight} кг</span></div>
+                    <div class="detail-item"><span class="k">Мест</span><span class="v">${o.cargo.places}</span></div>
+                    <div class="detail-item"><span class="k">Габариты</span><span class="v">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
                 </div>
-
-                <div class="detail-block">
-                    <h4>Груз</h4>
-                    <div class="detail-list">
-                        <div class="detail-item"><span class="k">Наименование</span><span class="v">${esc(o.cargo.name)}</span></div>
-                        <div class="detail-item"><span class="k">Вес</span><span class="v">${o.cargo.weight} кг</span></div>
-                        <div class="detail-item"><span class="k">Мест</span><span class="v">${o.cargo.places}</span></div>
-                        <div class="detail-item"><span class="k">Габариты</span><span class="v">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
-                    </div>
+                <div class="detail-block"><h4>Маршрут</h4>
+                    <div class="detail-item"><span class="k">Откуда</span><span class="v">${esc(o.route.from)}</span></div>
+                    <div class="detail-item"><span class="k">Куда</span><span class="v">${esc(o.route.to)}</span></div>
+                    <div class="detail-item"><span class="k">Дата отправки</span><span class="v">${esc(o.route.ship_date)}</span></div>
                 </div>
-
-                <div class="detail-block">
-                    <h4>Маршрут</h4>
-                    <div class="detail-list">
-                        <div class="detail-item"><span class="k">Откуда</span><span class="v">${esc(o.route.from)}</span></div>
-                        <div class="detail-item"><span class="k">Куда</span><span class="v">${esc(o.route.to)}</span></div>
-                        <div class="detail-item"><span class="k">Дата отправки</span><span class="v">${esc(o.route.ship_date)}</span></div>
-                    </div>
-                </div>
-
-                <div class="detail-block">
-                    <h4>Водитель</h4>
-                    <div class="detail-list">
-                        <div class="detail-item"><span class="k">Ожидается</span><span class="v">${esc(l.phone_expected || '—')}</span></div>
-                        <div class="detail-item"><span class="k">Получен</span><span class="v">${esc(l.phone_received || '—')}</span></div>
-                        <div class="detail-item"><span class="k">MAX ID</span><span class="v">${esc(l.max_user_id || '—')}</span></div>
-                        <div class="detail-item"><span class="k">Имя</span><span class="v">${esc(((l.first_name || '') + ' ' + (l.last_name || '')).trim() || '—')}</span></div>
-                        <div class="detail-item"><span class="k">Username</span><span class="v">${l.username ? '@' + esc(l.username) : '—'}</span></div>
-                    </div>
+                <div class="detail-block"><h4>Водитель</h4>
+                    <div class="detail-item"><span class="k">Ожидается</span><span class="v">${esc(l.phone_expected || '—')}</span></div>
+                    <div class="detail-item"><span class="k">Получен</span><span class="v">${esc(l.phone_received || '—')}</span></div>
+                    <div class="detail-item"><span class="k">MAX ID</span><span class="v">${esc(l.max_user_id || '—')}</span></div>
+                    <div class="detail-item"><span class="k">Имя</span><span class="v">${esc(((l.first_name || '') + ' ' + (l.last_name || '')).trim() || '—')}</span></div>
                 </div>
             `;
 
             if (i) {
                 h += `
-                    <div class="detail-block">
-                        <h4>Осмотр груза</h4>
+                    <div class="detail-block"><h4>Осмотр груза</h4>
                         <div class="check-list">
                             <div class="check-row ${i.check_packaging ? 'yes' : 'no'}"><span class="cicon">${i.check_packaging ? '✓' : '✕'}</span>Упаковка целая</div>
                             <div class="check-row ${i.check_marking ? 'yes' : 'no'}"><span class="cicon">${i.check_marking ? '✓' : '✕'}</span>Маркировка читаемая</div>
@@ -1718,43 +655,57 @@
                             <div class="check-row ${i.check_docs ? 'yes' : 'no'}"><span class="cicon">${i.check_docs ? '✓' : '✕'}</span>Документы в наличии</div>
                         </div>
                         ${i.comment ? `<div class="comment-box"><div class="label">Комментарий</div>${esc(i.comment)}</div>` : ''}
-                        <div class="detail-list" style="margin-top:12px;">
-                            <div class="detail-item"><span class="k">Подтверждено</span><span class="v">${fmtDate(i.confirmed_at)}</span></div>
-                        </div>
+                        <div class="detail-item" style="margin-top:12px;"><span class="k">Подтверждено</span><span class="v">${fmtDate(i.confirmed_at)}</span></div>
                     </div>
                 `;
             }
 
-            h += `
-                <div class="detail-block">
-                    <h4>История</h4>
-                    <div class="detail-list">
-                        ${(o.history || []).map(x => `
-                            <div class="detail-item"><span class="k">${esc(x.event)}</span><span class="v">${fmtDate(x.at)}</span></div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
+            if (o.document_generated_at || o.document_sent_at) {
+                h += `<div class="detail-block"><h4>Документы</h4>
+                    ${o.document_generated_at ? `<div class="detail-item"><span class="k">Акт сформирован</span><span class="v">${fmtDate(o.document_generated_at)}</span></div>` : ''}
+                    ${o.document_sent_at ? `<div class="detail-item"><span class="k">Отправлен водителю</span><span class="v">${fmtDate(o.document_sent_at)}</span></div>` : ''}
+                </div>`;
+            }
+
+            h += `<div class="detail-block"><h4>История</h4>
+                ${(o.history || []).map(x => `<div class="detail-item"><span class="k">${esc(x.event)}</span><span class="v">${fmtDate(x.at)}</span></div>`).join('')}
+            </div>`;
 
             return h;
         }
 
         function renderActions(o) {
             const a = [];
-            a.push('<button class="btn btn-ghost" data-action="delete" style="color:var(--red); margin-right:auto;">Удалить заказ</button>');
-            if (o.status === 'awaiting_docs') a.push('<button class="btn btn-primary" data-action="complete">Завершить заказ</button>');
-            if (o.status !== 'completed' && o.status !== 'cancelled') a.push('<button class="btn btn-secondary" data-action="cancel">Отменить</button>');
-            a.push('<button class="btn btn-ghost" data-action="close">Закрыть</button>');
+            // Удаление — слева
+            a.push('<button type="button" class="btn btn-ghost" data-action="delete" style="color:var(--red); margin-right:auto;">Удалить заказ</button>');
+
+            // Кнопки работы с документами (только если есть осмотр)
+            if (o.inspection) {
+                a.push('<button type="button" class="btn btn-secondary" data-action="generate-doc">📄 Сформировать акт</button>');
+                if (o.loader && o.loader.max_user_id) {
+                    a.push('<button type="button" class="btn btn-primary" data-action="send-doc">📤 Отправить водителю</button>');
+                }
+            }
+
+            // Управление статусом
+            if (o.status === 'awaiting_docs') {
+                a.push('<button type="button" class="btn btn-primary" data-action="complete">Завершить заказ</button>');
+            }
+            if (o.status !== 'completed' && o.status !== 'cancelled') {
+                a.push('<button type="button" class="btn btn-secondary" data-action="cancel">Отменить</button>');
+            }
+            a.push('<button type="button" class="btn btn-ghost" data-action="close">Закрыть</button>');
             return a.join('');
         }
 
         async function handleAction(order, action) {
             if (action === 'close') { $('#modal').classList.remove('show'); return; }
-            if (action === 'complete') await patchStatus(order.id, 'completed');
-            else if (action === 'cancel') {
-                if (!confirm('Отменить заказ?')) return;
-                await patchStatus(order.id, 'cancelled');
-            } else if (action === 'delete') {
+            if (action === 'complete') return patchStatus(order.id, 'completed');
+            if (action === 'cancel') {
+                if (!confirm(`Отменить заказ ${order.id}?`)) return;
+                return patchStatus(order.id, 'cancelled');
+            }
+            if (action === 'delete') {
                 const ok = confirm(
                     `Удалить заказ ${order.id} безвозвратно?\n\n` +
                     `Груз: ${order.cargo.name}\n` +
@@ -1762,8 +713,10 @@
                     `Это действие нельзя отменить.`
                 );
                 if (!ok) return;
-                await deleteOrderReq(order.id);
+                return deleteOrderReq(order.id);
             }
+            if (action === 'generate-doc') return generateDoc(order.id);
+            if (action === 'send-doc') return sendDoc(order.id);
         }
 
         async function patchStatus(id, status) {
@@ -1771,11 +724,16 @@
                 const res = await api('/api/order', { method: 'PATCH', body: JSON.stringify({ id, status }) });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    toast('Статус обновлён', 'success');
+                    toast('Статус обновлён: ' + STATUS_LABELS[status], 'success');
                     $('#modal').classList.remove('show');
                     loadOrders();
-                } else toast(data.error || 'Ошибка', 'error');
-            } catch { toast('Ошибка сети', 'error'); }
+                } else {
+                    toast(data.error || 'Ошибка обновления', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                toast('Ошибка сети', 'error');
+            }
         }
 
         async function deleteOrderReq(id) {
@@ -1789,18 +747,60 @@
                 } else {
                     toast(data.error || 'Ошибка удаления', 'error');
                 }
-            } catch { toast('Ошибка сети', 'error'); }
+            } catch (e) {
+                console.error(e);
+                toast('Ошибка сети', 'error');
+            }
+        }
+
+        async function generateDoc(id) {
+            try {
+                const res = await api(`/api/documents?id=${encodeURIComponent(id)}&action=generate`);
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    toast(data.error || 'Не удалось сформировать документ', 'error');
+                    return;
+                }
+                const html = await res.text();
+                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                toast('Акт сформирован', 'success');
+                loadOrders();
+            } catch (e) {
+                console.error(e);
+                toast('Ошибка сети', 'error');
+            }
+        }
+
+        async function sendDoc(id) {
+            if (!confirm('Отправить акт осмотра водителю в чат MAX?')) return;
+            try {
+                const res = await api('/api/documents', {
+                    method: 'POST',
+                    body: JSON.stringify({ id, action: 'send' }),
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    toast('Документ отправлен водителю', 'success');
+                    $('#modal').classList.remove('show');
+                    loadOrders();
+                } else {
+                    toast(data.error || 'Ошибка отправки', 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                toast('Ошибка сети', 'error');
+            }
         }
 
         $('#modal-close').addEventListener('click', () => $('#modal').classList.remove('show'));
         $('#modal').addEventListener('click', e => { if (e.target === $('#modal')) $('#modal').classList.remove('show'); });
 
-        // ============ AUTO REFRESH ============
         setInterval(() => {
             if (password && !$('#modal').classList.contains('show')) loadOrders();
         }, 15000);
 
-        // ============ INIT ============
         if (password) {
             api('/api/orders').then(res => res.ok ? showApp() : showLogin()).catch(showLogin);
         } else showLogin();
