@@ -29,11 +29,12 @@ export async function POST(request) {
 
     try {
         const order = await createOrder({ number, cargo, route, carrier, vehicle, loader });
+        const link = await buildLoaderLink(order.id);
         return jsonResponse({
             success: true,
             order,
-            loader_link: await buildLoaderLink(order.id),
-            sms_text: buildSmsText(order),
+            loader_link: link,
+            sms_text: buildSmsText(order, link),
         }, 201);
     } catch (err) {
         console.error('createOrder error:', err);

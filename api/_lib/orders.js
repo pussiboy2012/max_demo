@@ -192,16 +192,15 @@ export function normalizePhone(input) {
 /**
  * Текст SMS для водителя (диспетчер копирует и отправляет вручную).
  */
-export function buildSmsText(order) {
-    const link = buildLoaderLink(order.id);
-    if (!link) return null;
+export function buildSmsText(order, shortLink) {
+    if (!shortLink) return null;
     const cargo = order.cargo || {};
     const route = order.route || {};
     return [
         `Заказ ${order.number || order.id}.`,
         `${route.from} → ${route.to}.`,
         `${cargo.name}, ${cargo.places} мест, погрузка ${route.loading_time || '—'}.`,
-        `Откройте в MAX: ${link}`,
+        `Откройте в MAX: ${shortLink}`,
     ].join(' ');
 }
 
