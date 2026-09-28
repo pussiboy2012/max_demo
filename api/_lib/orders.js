@@ -188,12 +188,6 @@ export function normalizePhone(input) {
     return digits ? '+' + digits : '';
 }
 
-export function buildLoaderLink(orderId) {
-    const botUsername = process.env.BOT_USERNAME;
-    if (!botUsername) return null;
-    const clean = botUsername.replace('@', '');
-    return `https://max.ru/${clean}?start=${orderId}`;
-}
 
 /**
  * Текст SMS для водителя (диспетчер копирует и отправляет вручную).
@@ -209,4 +203,48 @@ export function buildSmsText(order) {
         `${cargo.name}, ${cargo.places} мест, погрузка ${route.loading_time || '—'}.`,
         `Откройте в MAX: ${link}`,
     ].join(' ');
+}
+
+/**
+ * Генерирует «длинный» deep-link на бота.
+ */
+export function buildLoaderLinkRaw(orderId) {
+    const botUsername = process.env.BOT_USERNAME;
+    if (!botUsername) return null;
+    const clean = botUsername.replace('@', '');
+    return `https://max.ru/${clean}?start=${orderId}`;
+}
+
+/**
+ * Сокращает ссылку через Яндекс.Кликер (clck.ru).
+ * Если сократить не удалось — возвращает исходную длинную ссылку.
+ */
+export async function shortenUrl(url) {
+    if (!url) return null;
+    try {
+        const res = await fetch(`https://clck.ru/--?url=${encodeURIComponent(url)}`);
+        if (!res.ok) {
+            console.error('clck.ru error:', res.status, await res.text());
+            return url;
+        }
+        const short = (await res.text()).trim();
+        // clck.ru возвращает либо короткую ссылку, либо текст ошибки
+        if (!short.startsWith('http')) {
+            console.error('clck.ru unexpected response:', short);
+            return url;
+        }
+        return short;
+    } catch (err) {
+        console.error('clck.ru fetch failed:', err);
+        return url;
+    }
+}
+
+/**
+ * Генерирует сокращённый deep-link на бота.
+ */
+export async function buildLoaderLink(orderId) {
+    const raw = buildLoaderLinkRaw(orderId);
+    if (!raw) return null;
+    return await shortenUrl(raw);
 }

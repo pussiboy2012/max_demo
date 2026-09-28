@@ -32,7 +32,7 @@ export async function POST(request) {
         return jsonResponse({
             success: true,
             order,
-            loader_link: buildLoaderLink(order.id),
+            loader_link: await buildLoaderLink(order.id),
             sms_text: buildSmsText(order),
         }, 201);
     } catch (err) {

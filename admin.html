@@ -813,17 +813,20 @@
             if (action === 'send-doc') return sendDoc(order.id);
 
             if (action === 'copy-link') {
-                const link = `${location.origin.replace(/\/$/, '')}/?start=${order.id}`;
-                // На самом деле ссылка на бота, а не на этот домен — используем сохранённую
                 try {
                     const res = await api(`/api/order?id=${encodeURIComponent(order.id)}`);
-                    // Пробуем восстановить loader_link из ответа заказа — но там его нет.
-                    // Пока просто скопируем то, что можем: deep-link по имени бота из админки
-                } catch {}
-                navigator.clipboard.writeText(link).then(
-                    () => toast('Ссылка скопирована (проверьте домен)', 'success'),
-                    () => toast('Не удалось скопировать', 'error')
-                );
+                    const data = await res.json();
+                    if (res.ok && data.loader_link) {
+                        navigator.clipboard.writeText(data.loader_link).then(
+                            () => toast('Короткая ссылка скопирована: ' + data.loader_link, 'success'),
+                            () => toast('Не удалось скопировать', 'error')
+                        );
+                    } else {
+                        toast('Ссылка не сгенерирована — проверьте BOT_USERNAME', 'error');
+                    }
+                } catch {
+                    toast('Ошибка сети', 'error');
+                }
                 return;
             }
 

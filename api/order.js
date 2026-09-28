@@ -1,5 +1,5 @@
 import { checkAdminAuth } from './_lib/auth.js';
-import { getOrder, updateOrder, deleteOrder, ORDER_STATUS } from './_lib/orders.js';
+import { getOrder, updateOrder, deleteOrder, ORDER_STATUS, buildLoaderLink } from './_lib/orders.js';
 
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), {
@@ -12,9 +12,14 @@ export async function GET(request) {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
     if (!id) return jsonResponse({ error: 'Не указан id' }, 400);
+
     const order = await getOrder(id);
     if (!order) return jsonResponse({ error: 'Заказ не найден' }, 404);
-    return jsonResponse({ success: true, order });
+
+    // Генерируем сокращённую ссылку на лету (не сохраняем — чтобы не устаревала)
+    const loader_link = await buildLoaderLink(order.id);
+
+    return jsonResponse({ success: true, order, loader_link });
 }
 
 /**
