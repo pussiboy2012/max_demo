@@ -1,212 +1,58 @@
-import crypto from 'node:crypto';
-import { redis } from './redis.js';
+import { checkAdminAuth } from './_lib/auth.js';
+import { createOrder, listOrders, buildLoaderLink, buildSmsText, CHECKLIST } from './_lib/orders.js';
 
-const ORDERS_INDEX = 'orders:all';
-
-export const ORDER_STATUS = {
-    CREATED: 'created',
-    AWAITING_PHONE: 'awaiting_phone',
-    AWAITING_FORM: 'awaiting_form',
-    AWAITING_REVIEW: 'awaiting_review',   // осмотр получен, диспетчер рассматривает
-    RECHECK: 'recheck',                    // назначен повторный осмотр
-    IMPOSSIBLE: 'impossible',              // водитель сообщил, что осмотр невозможен
-    COMPLETED: 'completed',
-    CANCELLED: 'cancelled',
-};
-
-export const CHECKLIST = [
-    { key: 'cargo_name',    label: 'Наименование груза',     positive: 'Соответствует', negative: 'Не совпало' },
-    { key: 'places',        label: 'Количество мест',        positive: 'Соответствует', negative: 'Не совпало' },
-    { key: 'weight',        label: 'Вес груза',              positive: 'Соответствует', negative: 'Не совпало' },
-    { key: 'dimensions',    label: 'Габариты',               positive: 'Соответствует', negative: 'Не совпало' },
-    { key: 'packaging',     label: 'Состояние упаковки',     positive: 'Целая',         negative: 'Повреждена' },
-    { key: 'marking',       label: 'Маркировка',             positive: 'Читаемая',      negative: 'Нечитаемая' },
-    { key: 'docs',          label: 'Документы на груз',      positive: 'В наличии',     negative: 'Отсутствуют' },
-    { key: 'vehicle_plate', label: 'Номер ТС',               positive: 'Совпадает',     negative: 'Не совпадает' },
-    { key: 'trailer',       label: 'Прицеп/полуприцеп',      positive: 'Совпадает',     negative: 'Не совпадает' },
-];
-
-function generateOrderId() {
-    return 'ord_' + crypto.randomBytes(4).toString('hex');
+function jsonResponse(body, status = 200) {
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: { 'Content-Type': 'application/json' },
+    });
 }
 
-export async function createOrder({ number, cargo, route, carrier, vehicle, loader }) {
-    const id = generateOrderId();
-    const now = new Date().toISOString();
+export async function POST(request) {
+    const auth = checkAdminAuth(request);
+    if (!auth.ok) return jsonResponse({ error: auth.error }, 401);
 
-    const order = {
-        id,
-        number: number || '',
-        status: ORDER_STATUS.CREATED,
-        created_at: now,
-        updated_at: now,
+    let body;
+    try { body = await request.json(); } catch { return jsonResponse({ error: 'Некорректный JSON' }, 400); }
 
-        cargo: {
-            name: cargo.name || '',
-            weight: parseFloat(cargo.weight) || 0,
-            places: parseInt(cargo.places, 10) || 0,
-            length: parseFloat(cargo.length) || 0,
-            width: parseFloat(cargo.width) || 0,
-            height: parseFloat(cargo.height) || 0,
-        },
+    const { number, cargo, route, carrier, vehicle, loader } = body;
+    const errors = [];
+    if (!number) errors.push('Номер поручения обязателен');
+    if (!cargo?.name) errors.push('Наименование груза обязательно');
+    if (!cargo?.places || parseInt(cargo.places, 10) <= 0) errors.push('Количество мест > 0');
+    if (!route?.from) errors.push('Пункт отправления обязателен');
+    if (!route?.to) errors.push('Пункт назначения обязателен');
+    if (!route?.loading_time) errors.push('Время погрузки обязательно');
+    if (!loader?.phone_expected) errors.push('Телефон водителя обязателен');
 
-        route: {
-            from: route.from || '',
-            to: route.to || '',
-            loading_time: route.loading_time || '',
-        },
+    if (errors.length) return jsonResponse({ error: 'Ошибка валидации', details: errors }, 422);
 
-        carrier: carrier || '',
-
-        vehicle: {
-            brand: vehicle?.brand || '',
-            plate: vehicle?.plate || '',
-            trailer: vehicle?.trailer || '',
-        },
-
-        loader: {
-            phone_expected: normalizePhone(loader.phone_expected || ''),
-            phone_received: null,
-            max_user_id: null,
-            first_name: null,
-            last_name: null,
-            username: null,
-        },
-
-        inspections: [],          // массив версий осмотра
-        current_inspection: 0,    // номер последней версии
-        resolution: null,         // резолюция диспетчера
-
-        history: [{ at: now, event: 'created', by: 'admin' }],
-    };
-
-    await redis.set(`order:${id}`, order);
-    await redis.sadd(ORDERS_INDEX, id);
-    return order;
-}
-
-export async function getOrder(id) {
-    if (!id) return null;
-    return await redis.get(`order:${id}`);
-}
-
-export async function updateOrder(id, patch, historyEvent = null, by = 'system') {
-    const order = await getOrder(id);
-    if (!order) return null;
-    const now = new Date().toISOString();
-
-    for (const key of Object.keys(patch)) {
-        if (patch[key] && typeof patch[key] === 'object' && !Array.isArray(patch[key])) {
-            order[key] = { ...(order[key] || {}), ...patch[key] };
-        } else {
-            order[key] = patch[key];
-        }
+    try {
+        const order = await createOrder({ number, cargo, route, carrier, vehicle, loader });
+        return jsonResponse({
+            success: true,
+            order,
+            loader_link: buildLoaderLink(order.id),
+            sms_text: buildSmsText(order),
+        }, 201);
+    } catch (err) {
+        console.error('createOrder error:', err);
+        return jsonResponse({ error: 'Не удалось создать заказ' }, 500);
     }
-    order.updated_at = now;
-    if (historyEvent) {
-        order.history = order.history || [];
-        order.history.push({ at: now, event: historyEvent, by });
+}
+
+export async function GET(request) {
+    const auth = checkAdminAuth(request);
+    if (!auth.ok) return jsonResponse({ error: auth.error }, 401);
+
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') || undefined;
+
+    try {
+        const orders = await listOrders({ status });
+        return jsonResponse({ success: true, orders, total: orders.length, checklist: CHECKLIST });
+    } catch (err) {
+        console.error('listOrders error:', err);
+        return jsonResponse({ error: 'Не удалось получить список' }, 500);
     }
-    await redis.set(`order:${id}`, order);
-    return order;
-}
-
-/**
- * Добавляет новую версию осмотра. Первая версия — 1, следующая — 2 и т.д.
- */
-export async function addInspection(id, inspection) {
-    const order = await getOrder(id);
-    if (!order) return null;
-
-    const now = new Date().toISOString();
-    const nextVersion = (order.current_inspection || 0) + 1;
-
-    const record = {
-        version: nextVersion,
-        type: inspection.type || 'inspection', // 'inspection' | 'impossible'
-        started_at: inspection.started_at || now,
-        confirmed_at: now,
-        inspector: {
-            user_id: inspection.inspector?.user_id || null,
-            first_name: inspection.inspector?.first_name || null,
-            last_name: inspection.inspector?.last_name || null,
-            phone: inspection.inspector?.phone || null,
-        },
-        answers: inspection.answers || [],
-        overall_comment: inspection.overall_comment || '',
-        impossible_reason: inspection.impossible_reason || '',
-        has_mismatch: (inspection.answers || []).some(a => a.match === false),
-        document_generated_at: null,
-        document_sent_at: null,
-    };
-
-    order.inspections = order.inspections || [];
-    order.inspections.push(record);
-    order.current_inspection = nextVersion;
-
-    // статус зависит от типа
-    if (record.type === 'impossible') {
-        order.status = ORDER_STATUS.IMPOSSIBLE;
-    } else {
-        order.status = ORDER_STATUS.AWAITING_REVIEW;
-    }
-
-    order.updated_at = now;
-    order.history = order.history || [];
-    order.history.push({ at: now, event: `inspection_v${nextVersion}_received`, by: 'loader' });
-
-    await redis.set(`order:${id}`, order);
-    return order;
-}
-
-export async function deleteOrder(id) {
-    if (!id) return false;
-    const exists = await redis.exists(`order:${id}`);
-    if (!exists) return false;
-    await redis.del(`order:${id}`);
-    await redis.srem(ORDERS_INDEX, id);
-    return true;
-}
-
-export async function listOrders({ status } = {}) {
-    const ids = (await redis.smembers(ORDERS_INDEX)) || [];
-    if (!ids.length) return [];
-    const orders = [];
-    for (const id of ids) {
-        const order = await getOrder(id);
-        if (!order) continue;
-        if (status && order.status !== status) continue;
-        orders.push(order);
-    }
-    orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    return orders;
-}
-
-export function normalizePhone(input) {
-    if (!input) return '';
-    const digits = String(input).replace(/\D/g, '');
-    return digits ? '+' + digits : '';
-}
-
-export function buildLoaderLink(orderId) {
-    const botUsername = process.env.BOT_USERNAME;
-    if (!botUsername) return null;
-    const clean = botUsername.replace('@', '');
-    return `https://max.ru/${clean}?start=${orderId}`;
-}
-
-/**
- * Текст SMS для водителя (диспетчер копирует и отправляет вручную).
- */
-export function buildSmsText(order) {
-    const link = buildLoaderLink(order.id);
-    if (!link) return null;
-    const cargo = order.cargo || {};
-    const route = order.route || {};
-    return [
-        `Заказ ${order.number || order.id}.`,
-        `${route.from} → ${route.to}.`,
-        `${cargo.name}, ${cargo.places} мест, погрузка ${route.loading_time || '—'}.`,
-        `Откройте в MAX: ${link}`,
-    ].join(' ');
 }

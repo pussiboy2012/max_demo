@@ -7,24 +7,40 @@ export const ORDER_STATUS = {
     CREATED: 'created',
     AWAITING_PHONE: 'awaiting_phone',
     AWAITING_FORM: 'awaiting_form',
-    AWAITING_DOCS: 'awaiting_docs',
+    AWAITING_REVIEW: 'awaiting_review',   // осмотр получен, диспетчер рассматривает
+    RECHECK: 'recheck',                    // назначен повторный осмотр
+    IMPOSSIBLE: 'impossible',              // водитель сообщил, что осмотр невозможен
     COMPLETED: 'completed',
     CANCELLED: 'cancelled',
 };
+
+export const CHECKLIST = [
+    { key: 'cargo_name',    label: 'Наименование груза',     positive: 'Соответствует', negative: 'Не совпало' },
+    { key: 'places',        label: 'Количество мест',        positive: 'Соответствует', negative: 'Не совпало' },
+    { key: 'weight',        label: 'Вес груза',              positive: 'Соответствует', negative: 'Не совпало' },
+    { key: 'dimensions',    label: 'Габариты',               positive: 'Соответствует', negative: 'Не совпало' },
+    { key: 'packaging',     label: 'Состояние упаковки',     positive: 'Целая',         negative: 'Повреждена' },
+    { key: 'marking',       label: 'Маркировка',             positive: 'Читаемая',      negative: 'Нечитаемая' },
+    { key: 'docs',          label: 'Документы на груз',      positive: 'В наличии',     negative: 'Отсутствуют' },
+    { key: 'vehicle_plate', label: 'Номер ТС',               positive: 'Совпадает',     negative: 'Не совпадает' },
+    { key: 'trailer',       label: 'Прицеп/полуприцеп',      positive: 'Совпадает',     negative: 'Не совпадает' },
+];
 
 function generateOrderId() {
     return 'ord_' + crypto.randomBytes(4).toString('hex');
 }
 
-export async function createOrder({ cargo, route, loader }) {
+export async function createOrder({ number, cargo, route, carrier, vehicle, loader }) {
     const id = generateOrderId();
     const now = new Date().toISOString();
 
     const order = {
         id,
+        number: number || '',
         status: ORDER_STATUS.CREATED,
         created_at: now,
         updated_at: now,
+
         cargo: {
             name: cargo.name || '',
             weight: parseFloat(cargo.weight) || 0,
@@ -33,11 +49,21 @@ export async function createOrder({ cargo, route, loader }) {
             width: parseFloat(cargo.width) || 0,
             height: parseFloat(cargo.height) || 0,
         },
+
         route: {
             from: route.from || '',
             to: route.to || '',
-            ship_date: route.ship_date || '',
+            loading_time: route.loading_time || '',
         },
+
+        carrier: carrier || '',
+
+        vehicle: {
+            brand: vehicle?.brand || '',
+            plate: vehicle?.plate || '',
+            trailer: vehicle?.trailer || '',
+        },
+
         loader: {
             phone_expected: normalizePhone(loader.phone_expected || ''),
             phone_received: null,
@@ -46,9 +72,11 @@ export async function createOrder({ cargo, route, loader }) {
             last_name: null,
             username: null,
         },
-        inspection: null,
-        document_generated_at: null,
-        document_sent_at: null,
+
+        inspections: [],          // массив версий осмотра
+        current_inspection: 0,    // номер последней версии
+        resolution: null,         // резолюция диспетчера
+
         history: [{ at: now, event: 'created', by: 'admin' }],
     };
 
@@ -65,7 +93,6 @@ export async function getOrder(id) {
 export async function updateOrder(id, patch, historyEvent = null, by = 'system') {
     const order = await getOrder(id);
     if (!order) return null;
-
     const now = new Date().toISOString();
 
     for (const key of Object.keys(patch)) {
@@ -75,13 +102,58 @@ export async function updateOrder(id, patch, historyEvent = null, by = 'system')
             order[key] = patch[key];
         }
     }
-
     order.updated_at = now;
-
     if (historyEvent) {
         order.history = order.history || [];
         order.history.push({ at: now, event: historyEvent, by });
     }
+    await redis.set(`order:${id}`, order);
+    return order;
+}
+
+/**
+ * Добавляет новую версию осмотра. Первая версия — 1, следующая — 2 и т.д.
+ */
+export async function addInspection(id, inspection) {
+    const order = await getOrder(id);
+    if (!order) return null;
+
+    const now = new Date().toISOString();
+    const nextVersion = (order.current_inspection || 0) + 1;
+
+    const record = {
+        version: nextVersion,
+        type: inspection.type || 'inspection', // 'inspection' | 'impossible'
+        started_at: inspection.started_at || now,
+        confirmed_at: now,
+        inspector: {
+            user_id: inspection.inspector?.user_id || null,
+            first_name: inspection.inspector?.first_name || null,
+            last_name: inspection.inspector?.last_name || null,
+            phone: inspection.inspector?.phone || null,
+        },
+        answers: inspection.answers || [],
+        overall_comment: inspection.overall_comment || '',
+        impossible_reason: inspection.impossible_reason || '',
+        has_mismatch: (inspection.answers || []).some(a => a.match === false),
+        document_generated_at: null,
+        document_sent_at: null,
+    };
+
+    order.inspections = order.inspections || [];
+    order.inspections.push(record);
+    order.current_inspection = nextVersion;
+
+    // статус зависит от типа
+    if (record.type === 'impossible') {
+        order.status = ORDER_STATUS.IMPOSSIBLE;
+    } else {
+        order.status = ORDER_STATUS.AWAITING_REVIEW;
+    }
+
+    order.updated_at = now;
+    order.history = order.history || [];
+    order.history.push({ at: now, event: `inspection_v${nextVersion}_received`, by: 'loader' });
 
     await redis.set(`order:${id}`, order);
     return order;
@@ -99,7 +171,6 @@ export async function deleteOrder(id) {
 export async function listOrders({ status } = {}) {
     const ids = (await redis.smembers(ORDERS_INDEX)) || [];
     if (!ids.length) return [];
-
     const orders = [];
     for (const id of ids) {
         const order = await getOrder(id);
@@ -107,7 +178,6 @@ export async function listOrders({ status } = {}) {
         if (status && order.status !== status) continue;
         orders.push(order);
     }
-
     orders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return orders;
 }
@@ -123,4 +193,20 @@ export function buildLoaderLink(orderId) {
     if (!botUsername) return null;
     const clean = botUsername.replace('@', '');
     return `https://max.ru/${clean}?start=${orderId}`;
+}
+
+/**
+ * Текст SMS для водителя (диспетчер копирует и отправляет вручную).
+ */
+export function buildSmsText(order) {
+    const link = buildLoaderLink(order.id);
+    if (!link) return null;
+    const cargo = order.cargo || {};
+    const route = order.route || {};
+    return [
+        `Заказ ${order.number || order.id}.`,
+        `${route.from} → ${route.to}.`,
+        `${cargo.name}, ${cargo.places} мест, погрузка ${route.loading_time || '—'}.`,
+        `Откройте в MAX: ${link}`,
+    ].join(' ');
 }

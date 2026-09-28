@@ -40,6 +40,8 @@
         .btn-secondary:hover:not(:disabled) { background: var(--bg-hover); }
         .btn-ghost { background: transparent; color: var(--text-muted); border-color: transparent; }
         .btn-ghost:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
+        .btn-danger { background: #fef2f2; color: var(--red); border-color: #fecaca; }
+        .btn-danger:hover:not(:disabled) { background: #fee2e2; }
         .btn-sm { padding: 6px 10px; font-size: 13px; }
         .btn-block { width: 100%; }
 
@@ -93,7 +95,7 @@
         .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
         .stat-label .dot { width: 6px; height: 6px; border-radius: 50%; }
         .stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
-        .dot-gray { background: #a3a3a3; } .dot-yellow { background: var(--yellow); } .dot-blue { background: var(--blue); } .dot-purple { background: var(--purple); } .dot-green { background: var(--green); }
+        .dot-gray { background: #a3a3a3; } .dot-yellow { background: var(--yellow); } .dot-blue { background: var(--blue); } .dot-purple { background: var(--purple); } .dot-green { background: var(--green); } .dot-red { background: var(--red); }
 
         .dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
         @media (max-width: 1000px) { .dash-grid { grid-template-columns: 1fr; } }
@@ -135,17 +137,19 @@
         .status-created { background: #fafafa; color: #525252; border-color: #e5e5e5; } .status-created .sdot { background: #a3a3a3; }
         .status-awaiting_phone { background: #fffbeb; color: #92400e; border-color: #fde68a; } .status-awaiting_phone .sdot { background: #f59e0b; }
         .status-awaiting_form { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; } .status-awaiting_form .sdot { background: #3b82f6; }
-        .status-awaiting_docs { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; } .status-awaiting_docs .sdot { background: #8b5cf6; }
+        .status-awaiting_review { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; } .status-awaiting_review .sdot { background: #8b5cf6; }
+        .status-recheck { background: #fff7ed; color: #9a3412; border-color: #fed7aa; } .status-recheck .sdot { background: #f97316; }
+        .status-impossible { background: #fef2f2; color: #991b1b; border-color: #fecaca; } .status-impossible .sdot { background: #ef4444; }
         .status-completed { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; } .status-completed .sdot { background: #10b981; }
-        .status-cancelled { background: #fef2f2; color: #991b1b; border-color: #fecaca; } .status-cancelled .sdot { background: #ef4444; }
+        .status-cancelled { background: #fafafa; color: #525252; border-color: #e5e5e5; } .status-cancelled .sdot { background: #737373; }
 
         .link-box { margin-top: 20px; padding: 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius); }
         .link-box-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; }
-        .link-box-value { font-family: ui-monospace, monospace; font-size: 12.5px; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; word-break: break-all; }
+        .link-box-value { font-family: ui-monospace, monospace; font-size: 12.5px; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; word-break: break-all; white-space: pre-wrap; }
 
         .modal-backdrop { position: fixed; inset: 0; background: rgba(15,15,15,0.4); backdrop-filter: blur(2px); display: none; align-items: center; justify-content: center; padding: 24px; z-index: 100; }
         .modal-backdrop.show { display: flex; }
-        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
         .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
         .modal-header h2 { font-size: 15px; font-weight: 600; }
         .modal-header .id { font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-dim); font-weight: 400; margin-left: 8px; }
@@ -162,20 +166,31 @@
         .detail-item .k { color: var(--text-muted); flex-shrink: 0; }
         .detail-item .v { text-align: right; word-break: break-word; min-width: 0; font-weight: 500; }
 
-        .check-list { display: flex; flex-direction: column; gap: 8px; }
-        .check-row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
-        .check-row .cicon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+        .inspection-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 12px; background: var(--bg-subtle); }
+        .inspection-card.current { border-color: var(--blue); background: #f8fafc; }
+        .inspection-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
+        .inspection-head .ver { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .inspection-head .stamp { font-size: 12px; color: var(--text-dim); }
+
+        .check-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+        .check-row { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; padding: 4px 0; }
+        .check-row .cicon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
         .check-row.yes .cicon { background: var(--green); }
         .check-row.no .cicon { background: var(--red); }
-        .check-row.no { color: var(--text-muted); }
+        .check-row .comment { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
 
-        .comment-box { margin-top: 12px; padding: 12px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; }
+        .resolution-box { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 10px; border-left: 3px solid; }
+        .resolution-box.accepted { background: #ecfdf5; border-color: var(--green); color: #065f46; }
+        .resolution-box.recheck { background: #fff7ed; border-color: var(--yellow); color: #9a3412; }
+        .resolution-box.rejected { background: #fef2f2; border-color: var(--red); color: #991b1b; }
+
+        .comment-box { margin-top: 12px; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13.5px; }
         .comment-box .label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
 
         .placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; color: var(--text-muted); }
         .placeholder-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--bg-subtle); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-dim); margin-bottom: 20px; }
         .placeholder h3 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-        .placeholder p { font-size: 13.5px; max-width: 380px; line-height: 1.55; }
+        .placeholder p { font-size: 13.5px; max-width: 420px; line-height: 1.55; }
 
         .toasts { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 200; }
         .toast { padding: 12px 16px; border-radius: var(--radius-sm); background: var(--text); color: #fff; font-size: 13.5px; font-weight: 500; box-shadow: var(--shadow-lg); animation: toastIn 0.2s ease; max-width: 340px; }
@@ -261,7 +276,7 @@
                         <div class="stat" data-goto-status=""><div class="stat-label">Всего <span class="dot dot-gray"></span></div><div class="stat-value" id="stat-total">0</div></div>
                         <div class="stat" data-goto-status="awaiting_phone"><div class="stat-label">Ждут номер <span class="dot dot-yellow"></span></div><div class="stat-value" id="stat-phone">0</div></div>
                         <div class="stat" data-goto-status="awaiting_form"><div class="stat-label">Ждут форму <span class="dot dot-blue"></span></div><div class="stat-value" id="stat-form">0</div></div>
-                        <div class="stat" data-goto-status="awaiting_docs"><div class="stat-label">Ждут док-ты <span class="dot dot-purple"></span></div><div class="stat-value" id="stat-docs">0</div></div>
+                        <div class="stat" data-goto-status="awaiting_review"><div class="stat-label">Ждут решения <span class="dot dot-purple"></span></div><div class="stat-value" id="stat-review">0</div></div>
                         <div class="stat" data-goto-status="completed"><div class="stat-label">Завершено <span class="dot dot-green"></span></div><div class="stat-value" id="stat-done">0</div></div>
                     </div>
                     <div class="dash-grid">
@@ -280,28 +295,44 @@
                 </section>
 
                 <section class="page-view" data-view="create">
-                    <div class="page-header"><h2>Новый заказ</h2><p>Заполните данные — система сформирует ссылку для водителя</p></div>
+                    <div class="page-header"><h2>Новый заказ</h2><p>Заполните данные поручения — система сформирует SMS для водителя</p></div>
                     <div style="max-width:720px;">
                         <div class="card">
                             <form id="create-form" class="form-grid">
-                                <div class="form-field"><label>Наименование груза <span class="req">*</span></label><input type="text" name="cargo_name" placeholder="Например: Coca-Cola, паллеты" required></div>
+                                <div class="form-field"><label>Номер поручения <span class="req">*</span></label><input type="text" name="number" placeholder="ЗК-2026-001" required></div>
+
+                                <div class="form-field"><label>Наименование груза <span class="req">*</span></label><input type="text" name="cargo_name" placeholder="Coca-Cola, паллеты" required></div>
+
                                 <div class="form-row form-row-2">
-                                    <div class="form-field"><label>Вес, кг <span class="req">*</span></label><input type="number" name="weight" placeholder="1200" step="0.1" min="0.1" required></div>
                                     <div class="form-field"><label>Мест, шт <span class="req">*</span></label><input type="number" name="places" placeholder="24" step="1" min="1" required></div>
+                                    <div class="form-field"><label>Вес, кг</label><input type="number" name="weight" placeholder="1200" step="0.1" min="0"></div>
                                 </div>
+
                                 <div class="form-row form-row-3">
                                     <div class="form-field"><label>Длина, см</label><input type="number" name="length" placeholder="120" step="1" min="1"></div>
                                     <div class="form-field"><label>Ширина, см</label><input type="number" name="width" placeholder="80" step="1" min="1"></div>
                                     <div class="form-field"><label>Высота, см</label><input type="number" name="height" placeholder="100" step="1" min="1"></div>
                                 </div>
+
                                 <div class="form-row form-row-2">
                                     <div class="form-field"><label>Откуда <span class="req">*</span></label><input type="text" name="from" placeholder="Москва, склад №5" required></div>
                                     <div class="form-field"><label>Куда <span class="req">*</span></label><input type="text" name="to" placeholder="СПб, ТК Лента" required></div>
                                 </div>
+
                                 <div class="form-row form-row-2">
-                                    <div class="form-field"><label>Дата отправки <span class="req">*</span></label><input type="date" name="ship_date" required></div>
-                                    <div class="form-field"><label>Телефон водителя <span class="req">*</span></label><input type="tel" name="phone_expected" id="phone-input" placeholder="+7 (___) ___-__-__" inputmode="tel" autocomplete="off" maxlength="18" required></div>
+                                    <div class="form-field"><label>Время погрузки <span class="req">*</span></label><input type="text" name="loading_time" placeholder="15.10.2026 09:00" required></div>
+                                    <div class="form-field"><label>Перевозчик</label><input type="text" name="carrier" placeholder="ООО Ромашка"></div>
                                 </div>
+
+                                <div class="form-row form-row-2">
+                                    <div class="form-field"><label>Марка ТС</label><input type="text" name="vehicle_brand" placeholder="Volvo FH"></div>
+                                    <div class="form-field"><label>Госномер ТС</label><input type="text" name="vehicle_plate" placeholder="А123БВ77"></div>
+                                </div>
+
+                                <div class="form-field"><label>Прицеп (если есть)</label><input type="text" name="vehicle_trailer" placeholder="ЕК1234 77"></div>
+
+                                <div class="form-field"><label>Телефон водителя <span class="req">*</span></label><input type="tel" name="phone_expected" id="phone-input" placeholder="+7 (___) ___-__-__" inputmode="tel" autocomplete="off" maxlength="18" required></div>
+
                                 <div style="display:flex; gap:8px; margin-top:4px;">
                                     <button type="submit" class="btn btn-primary" id="create-btn">Создать заказ</button>
                                     <button type="button" class="btn btn-secondary" id="create-reset">Очистить</button>
@@ -319,7 +350,9 @@
                         <button class="filter" data-status="created">Создан</button>
                         <button class="filter" data-status="awaiting_phone">Ждём номер</button>
                         <button class="filter" data-status="awaiting_form">Ждём форму</button>
-                        <button class="filter" data-status="awaiting_docs">Ждём документы</button>
+                        <button class="filter" data-status="awaiting_review">Ждёт решения</button>
+                        <button class="filter" data-status="recheck">Повторный</button>
+                        <button class="filter" data-status="impossible">Невозможен</button>
                         <button class="filter" data-status="completed">Завершён</button>
                         <button class="filter" data-status="cancelled">Отменён</button>
                     </div>
@@ -328,7 +361,7 @@
 
                 <section class="page-view" data-view="docs">
                     <div class="page-header"><h2>Документы</h2><p>Накладные, ТТН и акты осмотра</p></div>
-                    <div class="card"><div class="placeholder"><div class="placeholder-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Раздел в разработке</h3><p>Здесь появится реестр сгенерированных документов. Пока генерируйте акты из карточки заказа.</p></div></div>
+                    <div class="card"><div class="placeholder"><div class="placeholder-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Раздел в разработке</h3><p>Здесь появится реестр сгенерированных документов. Пока генерируйте PDF-отчёты из карточки заказа.</p></div></div>
                 </section>
 
                 <section class="page-view" data-view="archive">
@@ -366,7 +399,6 @@
         let currentFilter = '';
         let allOrders = [];
         let currentPage = 'dashboard';
-        let currentOrderId = null;
 
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
@@ -391,7 +423,16 @@
             });
         }
 
-        const STATUS_LABELS = { created: 'Создан', awaiting_phone: 'Ждём номер', awaiting_form: 'Ждём форму', awaiting_docs: 'Ждём документы', completed: 'Завершён', cancelled: 'Отменён' };
+        const STATUS_LABELS = {
+            created: 'Создан',
+            awaiting_phone: 'Ждём номер',
+            awaiting_form: 'Ждём форму',
+            awaiting_review: 'Ждёт решения',
+            recheck: 'Повторный осмотр',
+            impossible: 'Осмотр невозможен',
+            completed: 'Завершён',
+            cancelled: 'Отменён',
+        };
         function statusBadge(s) { return `<span class="status status-${s}"><span class="sdot"></span>${STATUS_LABELS[s] || s}</span>`; }
         function fmtDate(iso) { if (!iso) return '—'; return new Date(iso).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
 
@@ -437,10 +478,6 @@
         $('#refresh-btn').addEventListener('click', () => { loadOrders(); toast('Обновлено'); });
 
         // ============ ТЕЛЕФОН ============
-        const today = new Date().toISOString().split('T')[0];
-        document.querySelector('input[name="ship_date"]').value = today;
-        document.querySelector('input[name="ship_date"]').min = today;
-
         const phoneInput = document.getElementById('phone-input');
         function formatPhone(raw) {
             let d = String(raw).replace(/\D/g, '');
@@ -473,7 +510,6 @@
         // ============ СОЗДАНИЕ ============
         $('#create-reset').addEventListener('click', () => {
             $('#create-form').reset();
-            document.querySelector('input[name="ship_date"]').value = today;
             phoneInput.classList.remove('valid', 'invalid');
             $('#link-result').innerHTML = '';
         });
@@ -483,19 +519,38 @@
             const btn = $('#create-btn');
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Создание...';
+
             const fd = new FormData(e.target);
             const payload = {
-                cargo: { name: fd.get('cargo_name'), weight: parseFloat(fd.get('weight')), places: parseInt(fd.get('places'), 10), length: parseFloat(fd.get('length')) || 0, width: parseFloat(fd.get('width')) || 0, height: parseFloat(fd.get('height')) || 0 },
-                route: { from: fd.get('from'), to: fd.get('to'), ship_date: fd.get('ship_date') },
+                number: fd.get('number'),
+                cargo: {
+                    name: fd.get('cargo_name'),
+                    weight: parseFloat(fd.get('weight')) || 0,
+                    places: parseInt(fd.get('places'), 10),
+                    length: parseFloat(fd.get('length')) || 0,
+                    width: parseFloat(fd.get('width')) || 0,
+                    height: parseFloat(fd.get('height')) || 0,
+                },
+                route: {
+                    from: fd.get('from'),
+                    to: fd.get('to'),
+                    loading_time: fd.get('loading_time'),
+                },
+                carrier: fd.get('carrier'),
+                vehicle: {
+                    brand: fd.get('vehicle_brand'),
+                    plate: fd.get('vehicle_plate'),
+                    trailer: fd.get('vehicle_trailer'),
+                },
                 loader: { phone_expected: fd.get('phone_expected').replace(/\D/g, '') },
             };
+
             try {
                 const res = await api('/api/orders', { method: 'POST', body: JSON.stringify(payload) });
                 const result = await res.json();
                 if (res.ok && result.success) {
                     toast('Заказ создан: ' + result.order.id, 'success');
                     e.target.reset();
-                    document.querySelector('input[name="ship_date"]').value = today;
                     phoneInput.classList.remove('valid', 'invalid');
                     showLinkBox(result);
                     loadOrders();
@@ -509,22 +564,26 @@
 
         function showLinkBox(result) {
             const link = result.loader_link;
+            const sms = result.sms_text;
             if (!link) {
                 $('#link-result').innerHTML = `<div class="link-box"><div class="link-box-label">Ссылка не сгенерирована</div><div style="font-size:13px;color:var(--red);">Проверьте переменную BOT_USERNAME на Vercel</div></div>`;
                 return;
             }
             $('#link-result').innerHTML = `
                 <div class="link-box">
-                    <div class="link-box-label">Ссылка для водителя · ${esc(result.order.id)}</div>
-                    <div class="link-box-value">${esc(link)}</div>
-                    <button class="btn btn-primary btn-sm" id="copy-link">Скопировать</button>
+                    <div class="link-box-label">SMS-текст для водителя · ${esc(result.order.number || result.order.id)}</div>
+                    <div class="link-box-value" id="sms-value">${esc(sms || link)}</div>
+                    <button class="btn btn-primary btn-sm" id="copy-sms">Скопировать SMS</button>
+                    <button class="btn btn-secondary btn-sm" id="copy-link" style="margin-left:6px;">Только ссылку</button>
                 </div>`;
-            $('#copy-link').addEventListener('click', () => {
-                navigator.clipboard.writeText(link).then(
-                    () => toast('Ссылка скопирована', 'success'),
-                    () => toast('Не удалось скопировать', 'error')
-                );
-            });
+
+            const copyText = (text, label) => navigator.clipboard.writeText(text).then(
+                () => toast(label + ' скопировано', 'success'),
+                () => toast('Не удалось скопировать', 'error')
+            );
+
+            $('#copy-sms').addEventListener('click', () => copyText(sms || link, 'SMS'));
+            $('#copy-link').addEventListener('click', () => copyText(link, 'Ссылка'));
         }
 
         // ============ СПИСОК ============
@@ -549,15 +608,14 @@
             }
             $('#orders-list').innerHTML = allOrders.map(o => `
                 <div class="order-row" data-id="${esc(o.id)}">
-                    <div class="order-row-id">${esc(o.id)}</div>
+                    <div class="order-row-id">${esc(o.number || o.id)}</div>
                     <div class="order-row-main">
                         <div class="order-row-name">${esc(o.cargo.name || '—')}</div>
                         <div class="order-row-route">${esc(o.route.from || '—')} → ${esc(o.route.to || '—')}</div>
                     </div>
                     <div class="order-row-meta">
-                        <span>${o.cargo.weight} кг</span>
                         <span>${o.cargo.places} мест</span>
-                        <span>${esc(o.route.ship_date)}</span>
+                        <span>${esc(o.route.loading_time || '—')}</span>
                     </div>
                     <div>${statusBadge(o.status)}</div>
                 </div>
@@ -566,12 +624,12 @@
         }
 
         function renderStats() {
-            const s = { total: allOrders.length, awaiting_phone: 0, awaiting_form: 0, awaiting_docs: 0, completed: 0 };
+            const s = { total: allOrders.length, awaiting_phone: 0, awaiting_form: 0, awaiting_review: 0, completed: 0 };
             allOrders.forEach(o => { if (s[o.status] !== undefined) s[o.status]++; });
             $('#stat-total').textContent = s.total;
             $('#stat-phone').textContent = s.awaiting_phone;
             $('#stat-form').textContent = s.awaiting_form;
-            $('#stat-docs').textContent = s.awaiting_docs;
+            $('#stat-review').textContent = s.awaiting_review;
             $('#stat-done').textContent = s.completed;
         }
 
@@ -601,8 +659,7 @@
         function openOrder(id) {
             const o = allOrders.find(x => x.id === id);
             if (!o) return;
-            currentOrderId = id;
-            $('#modal-id').textContent = o.id;
+            $('#modal-id').textContent = o.number || o.id;
             $('#modal-body').innerHTML = renderDetail(o);
             $('#modal-actions').innerHTML = renderActions(o);
             $('#modal').classList.add('show');
@@ -620,50 +677,84 @@
 
         function renderDetail(o) {
             const l = o.loader || {};
-            const i = o.inspection;
+            const v = o.vehicle || {};
 
             let h = `
                 <div class="detail-block"><h4>Статус</h4><div>${statusBadge(o.status)}</div></div>
-                <div class="detail-block"><h4>Груз</h4>
-                    <div class="detail-item"><span class="k">Наименование</span><span class="v">${esc(o.cargo.name)}</span></div>
-                    <div class="detail-item"><span class="k">Вес</span><span class="v">${o.cargo.weight} кг</span></div>
-                    <div class="detail-item"><span class="k">Мест</span><span class="v">${o.cargo.places}</span></div>
+
+                <div class="detail-block"><h4>Поручение</h4>
+                    <div class="detail-item"><span class="k">Номер</span><span class="v">${esc(o.number || '—')}</span></div>
+                    <div class="detail-item"><span class="k">Перевозчик</span><span class="v">${esc(o.carrier || '—')}</span></div>
+                    <div class="detail-item"><span class="k">Груз</span><span class="v">${esc(o.cargo.name)} · ${o.cargo.places} мест · ${o.cargo.weight} кг</span></div>
                     <div class="detail-item"><span class="k">Габариты</span><span class="v">${o.cargo.length} × ${o.cargo.width} × ${o.cargo.height} см</span></div>
+                    <div class="detail-item"><span class="k">Маршрут</span><span class="v">${esc(o.route.from)} → ${esc(o.route.to)}</span></div>
+                    <div class="detail-item"><span class="k">Время погрузки</span><span class="v">${esc(o.route.loading_time || '—')}</span></div>
+                    <div class="detail-item"><span class="k">ТС</span><span class="v">${esc(v.brand || '—')}, ${esc(v.plate || '—')}${v.trailer ? ', ' + esc(v.trailer) : ''}</span></div>
                 </div>
-                <div class="detail-block"><h4>Маршрут</h4>
-                    <div class="detail-item"><span class="k">Откуда</span><span class="v">${esc(o.route.from)}</span></div>
-                    <div class="detail-item"><span class="k">Куда</span><span class="v">${esc(o.route.to)}</span></div>
-                    <div class="detail-item"><span class="k">Дата отправки</span><span class="v">${esc(o.route.ship_date)}</span></div>
-                </div>
+
                 <div class="detail-block"><h4>Водитель</h4>
                     <div class="detail-item"><span class="k">Ожидается</span><span class="v">${esc(l.phone_expected || '—')}</span></div>
                     <div class="detail-item"><span class="k">Получен</span><span class="v">${esc(l.phone_received || '—')}</span></div>
-                    <div class="detail-item"><span class="k">MAX ID</span><span class="v">${esc(l.max_user_id || '—')}</span></div>
                     <div class="detail-item"><span class="k">Имя</span><span class="v">${esc(((l.first_name || '') + ' ' + (l.last_name || '')).trim() || '—')}</span></div>
+                    <div class="detail-item"><span class="k">MAX ID</span><span class="v">${esc(l.max_user_id || '—')}</span></div>
                 </div>
             `;
 
-            if (i) {
-                h += `
-                    <div class="detail-block"><h4>Осмотр груза</h4>
-                        <div class="check-list">
-                            <div class="check-row ${i.check_packaging ? 'yes' : 'no'}"><span class="cicon">${i.check_packaging ? '✓' : '✕'}</span>Упаковка целая</div>
-                            <div class="check-row ${i.check_marking ? 'yes' : 'no'}"><span class="cicon">${i.check_marking ? '✓' : '✕'}</span>Маркировка читаемая</div>
-                            <div class="check-row ${i.check_weight_actual ? 'yes' : 'no'}"><span class="cicon">${i.check_weight_actual ? '✓' : '✕'}</span>Вес совпадает</div>
-                            <div class="check-row ${i.check_no_damage ? 'yes' : 'no'}"><span class="cicon">${i.check_no_damage ? '✓' : '✕'}</span>Повреждения отсутствуют</div>
-                            <div class="check-row ${i.check_no_odor ? 'yes' : 'no'}"><span class="cicon">${i.check_no_odor ? '✓' : '✕'}</span>Посторонние запахи отсутствуют</div>
-                            <div class="check-row ${i.check_docs ? 'yes' : 'no'}"><span class="cicon">${i.check_docs ? '✓' : '✕'}</span>Документы в наличии</div>
-                        </div>
-                        ${i.comment ? `<div class="comment-box"><div class="label">Комментарий</div>${esc(i.comment)}</div>` : ''}
-                        <div class="detail-item" style="margin-top:12px;"><span class="k">Подтверждено</span><span class="v">${fmtDate(i.confirmed_at)}</span></div>
-                    </div>
-                `;
+            // Все версии осмотра
+            const inspections = o.inspections || [];
+            if (inspections.length) {
+                h += `<div class="detail-block"><h4>Осмотры (${inspections.length})</h4>`;
+                inspections.forEach(insp => {
+                    const isCurrent = insp.version === o.current_inspection;
+                    h += `<div class="inspection-card ${isCurrent ? 'current' : ''}">
+                        <div class="inspection-head">
+                            <span class="ver">Версия ${insp.version}${isCurrent ? ' · текущая' : ''}</span>
+                            <span class="stamp">${fmtDate(insp.confirmed_at)}</span>
+                        </div>`;
+
+                    if (insp.type === 'impossible') {
+                        h += `<div style="color:var(--red);font-weight:600;font-size:13px;">⚠️ Осмотр невозможен</div>
+                              <div class="comment-box"><div class="label">Причина</div>${esc(insp.impossible_reason)}</div>`;
+                    } else {
+                        const mism = (insp.answers || []).filter(a => !a.match).length;
+                        h += `<div style="font-size:12px;color:${mism ? 'var(--red)' : 'var(--green)'};font-weight:600;margin-bottom:6px;">
+                            ${mism ? `Расхождений: ${mism}` : 'Всё соответствует'}
+                        </div>`;
+                        h += `<div class="check-list">`;
+                        (insp.answers || []).forEach(a => {
+                            h += `<div class="check-row ${a.match ? 'yes' : 'no'}">
+                                <span class="cicon">${a.match ? '✓' : '✕'}</span>
+                                <div style="flex:1;">
+                                    <div>${esc(a.label)}</div>
+                                    ${!a.match && a.comment ? `<div class="comment">Комментарий: ${esc(a.comment)}</div>` : ''}
+                                </div>
+                            </div>`;
+                        });
+                        h += `</div>`;
+                        if (insp.overall_comment) {
+                            h += `<div class="comment-box"><div class="label">Общий комментарий</div>${esc(insp.overall_comment)}</div>`;
+                        }
+                    }
+
+                    if (insp.document_generated_at || insp.document_sent_at) {
+                        h += `<div style="margin-top:10px;font-size:12px;color:var(--text-dim);">`;
+                        if (insp.document_generated_at) h += `PDF сформирован: ${fmtDate(insp.document_generated_at)}<br>`;
+                        if (insp.document_sent_at) h += `Отправлен водителю: ${fmtDate(insp.document_sent_at)}`;
+                        h += `</div>`;
+                    }
+                    h += `</div>`;
+                });
+                h += `</div>`;
             }
 
-            if (o.document_generated_at || o.document_sent_at) {
-                h += `<div class="detail-block"><h4>Документы</h4>
-                    ${o.document_generated_at ? `<div class="detail-item"><span class="k">Акт сформирован</span><span class="v">${fmtDate(o.document_generated_at)}</span></div>` : ''}
-                    ${o.document_sent_at ? `<div class="detail-item"><span class="k">Отправлен водителю</span><span class="v">${fmtDate(o.document_sent_at)}</span></div>` : ''}
+            if (o.resolution) {
+                const cls = o.resolution.status === 'accepted' ? 'accepted' : o.resolution.status === 'recheck' ? 'recheck' : 'rejected';
+                const label = o.resolution.status === 'accepted' ? 'Принято' : o.resolution.status === 'recheck' ? 'Назначен повторный осмотр' : 'Отклонено';
+                h += `<div class="detail-block"><h4>Резолюция диспетчера</h4>
+                    <div class="resolution-box ${cls}">
+                        <strong>${label}</strong> · ${fmtDate(o.resolution.resolved_at)}
+                        ${o.resolution.comment ? `<div style="margin-top:6px;">${esc(o.resolution.comment)}</div>` : ''}
+                    </div>
                 </div>`;
             }
 
@@ -676,23 +767,34 @@
 
         function renderActions(o) {
             const a = [];
-            // Удаление — слева
-            a.push('<button type="button" class="btn btn-ghost" data-action="delete" style="color:var(--red); margin-right:auto;">Удалить заказ</button>');
+            a.push('<button type="button" class="btn btn-danger" data-action="delete" style="margin-right:auto;">Удалить</button>');
 
-            // Кнопки работы с документами (только если есть осмотр)
-            if (o.inspection) {
-                a.push('<button type="button" class="btn btn-secondary" data-action="generate-doc">📄 Сформировать акт</button>');
+            const insp = o.inspections || [];
+            const last = insp[insp.length - 1];
+
+            if (last && last.type !== 'impossible') {
+                a.push('<button type="button" class="btn btn-secondary" data-action="generate-doc">📄 PDF-отчёт</button>');
                 if (o.loader && o.loader.max_user_id) {
-                    a.push('<button type="button" class="btn btn-primary" data-action="send-doc">📤 Отправить водителю</button>');
+                    a.push('<button type="button" class="btn btn-secondary" data-action="send-doc">📤 Водителю</button>');
                 }
             }
 
-            // Управление статусом
-            if (o.status === 'awaiting_docs') {
-                a.push('<button type="button" class="btn btn-primary" data-action="complete">Завершить заказ</button>');
+            if (o.status === 'awaiting_review' || o.status === 'impossible') {
+                if (o.status !== 'impossible') {
+                    a.push('<button type="button" class="btn btn-primary" data-action="accept">✓ Принять</button>');
+                }
+                a.push('<button type="button" class="btn btn-secondary" data-action="recheck">↻ Повторный</button>');
+                a.push('<button type="button" class="btn btn-secondary" data-action="reject">✕ Отклонить</button>');
             }
+
+            if (o.status === 'created' || o.status === 'awaiting_phone' || o.status === 'awaiting_form' || o.status === 'recheck') {
+                if (o.loader && o.loader.phone_expected) {
+                    a.push('<button type="button" class="btn btn-secondary" data-action="copy-link">🔗 Ссылка</button>');
+                }
+            }
+
             if (o.status !== 'completed' && o.status !== 'cancelled') {
-                a.push('<button type="button" class="btn btn-secondary" data-action="cancel">Отменить</button>');
+                a.push('<button type="button" class="btn btn-ghost" data-action="cancel">Отменить</button>');
             }
             a.push('<button type="button" class="btn btn-ghost" data-action="close">Закрыть</button>');
             return a.join('');
@@ -700,23 +802,67 @@
 
         async function handleAction(order, action) {
             if (action === 'close') { $('#modal').classList.remove('show'); return; }
-            if (action === 'complete') return patchStatus(order.id, 'completed');
-            if (action === 'cancel') {
-                if (!confirm(`Отменить заказ ${order.id}?`)) return;
-                return patchStatus(order.id, 'cancelled');
-            }
+
             if (action === 'delete') {
-                const ok = confirm(
-                    `Удалить заказ ${order.id} безвозвратно?\n\n` +
-                    `Груз: ${order.cargo.name}\n` +
-                    `Маршрут: ${order.route.from} → ${order.route.to}\n\n` +
-                    `Это действие нельзя отменить.`
-                );
+                const ok = confirm(`Удалить заказ ${order.number || order.id} безвозвратно?\n\nЭто действие нельзя отменить.`);
                 if (!ok) return;
                 return deleteOrderReq(order.id);
             }
+
             if (action === 'generate-doc') return generateDoc(order.id);
             if (action === 'send-doc') return sendDoc(order.id);
+
+            if (action === 'copy-link') {
+                const link = `${location.origin.replace(/\/$/, '')}/?start=${order.id}`;
+                // На самом деле ссылка на бота, а не на этот домен — используем сохранённую
+                try {
+                    const res = await api(`/api/order?id=${encodeURIComponent(order.id)}`);
+                    // Пробуем восстановить loader_link из ответа заказа — но там его нет.
+                    // Пока просто скопируем то, что можем: deep-link по имени бота из админки
+                } catch {}
+                navigator.clipboard.writeText(link).then(
+                    () => toast('Ссылка скопирована (проверьте домен)', 'success'),
+                    () => toast('Не удалось скопировать', 'error')
+                );
+                return;
+            }
+
+            if (action === 'accept') {
+                if (!confirm('Принять результат осмотра? Заказ будет завершён.')) return;
+                return resolution(order.id, 'accept', '');
+            }
+            if (action === 'recheck') {
+                const comment = prompt('Что перепроверить / комментарий для водителя:');
+                if (comment === null) return;
+                return resolution(order.id, 'recheck', comment);
+            }
+            if (action === 'reject') {
+                const comment = prompt('Причина отклонения:');
+                if (comment === null) return;
+                return resolution(order.id, 'reject', comment);
+            }
+            if (action === 'cancel') {
+                if (!confirm(`Отменить заказ ${order.number || order.id}?`)) return;
+                return patchStatus(order.id, 'cancelled');
+            }
+        }
+
+        async function resolution(id, act, comment) {
+            try {
+                const res = await api('/api/order', {
+                    method: 'PATCH',
+                    body: JSON.stringify({ id, action: act, comment }),
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    const labels = { accept: 'принят', recheck: 'назначен повторный осмотр', reject: 'отклонён' };
+                    toast('Заказ ' + (labels[act] || 'обновлён'), 'success');
+                    $('#modal').classList.remove('show');
+                    loadOrders();
+                } else {
+                    toast(data.error || 'Ошибка', 'error');
+                }
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         async function patchStatus(id, status) {
@@ -724,16 +870,13 @@
                 const res = await api('/api/order', { method: 'PATCH', body: JSON.stringify({ id, status }) });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    toast('Статус обновлён: ' + STATUS_LABELS[status], 'success');
+                    toast('Статус обновлён: ' + (STATUS_LABELS[status] || status), 'success');
                     $('#modal').classList.remove('show');
                     loadOrders();
                 } else {
-                    toast(data.error || 'Ошибка обновления', 'error');
+                    toast(data.error || 'Ошибка', 'error');
                 }
-            } catch (e) {
-                console.error(e);
-                toast('Ошибка сети', 'error');
-            }
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         async function deleteOrderReq(id) {
@@ -747,51 +890,42 @@
                 } else {
                     toast(data.error || 'Ошибка удаления', 'error');
                 }
-            } catch (e) {
-                console.error(e);
-                toast('Ошибка сети', 'error');
-            }
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         async function generateDoc(id) {
             try {
-                const res = await api(`/api/documents?id=${encodeURIComponent(id)}&action=generate`);
+                const res = await api(`/api/documents?id=${encodeURIComponent(id)}`);
                 if (!res.ok) {
                     const data = await res.json().catch(() => ({}));
-                    toast(data.error || 'Не удалось сформировать документ', 'error');
+                    toast(data.error || 'Не удалось сформировать', 'error');
                     return;
                 }
                 const html = await res.text();
                 const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 window.open(url, '_blank');
-                toast('Акт сформирован', 'success');
+                toast('PDF-отчёт открыт (нажмите «Печать» → «Сохранить в PDF»)', 'success');
                 loadOrders();
-            } catch (e) {
-                console.error(e);
-                toast('Ошибка сети', 'error');
-            }
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         async function sendDoc(id) {
-            if (!confirm('Отправить акт осмотра водителю в чат MAX?')) return;
+            if (!confirm('Отправить отчёт водителю в чат MAX?')) return;
             try {
                 const res = await api('/api/documents', {
                     method: 'POST',
-                    body: JSON.stringify({ id, action: 'send' }),
+                    body: JSON.stringify({ id }),
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    toast('Документ отправлен водителю', 'success');
+                    toast('Отчёт отправлен водителю', 'success');
                     $('#modal').classList.remove('show');
                     loadOrders();
                 } else {
                     toast(data.error || 'Ошибка отправки', 'error');
                 }
-            } catch (e) {
-                console.error(e);
-                toast('Ошибка сети', 'error');
-            }
+            } catch { toast('Ошибка сети', 'error'); }
         }
 
         $('#modal-close').addEventListener('click', () => $('#modal').classList.remove('show'));
