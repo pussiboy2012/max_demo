@@ -320,7 +320,7 @@
                                 </div>
 
                                 <div class="form-row form-row-2">
-                                    <div class="form-field"><label>Время погрузки <span class="req">*</span></label><input type="text" name="loading_time" placeholder="15.10.2026 09:00" required></div>
+                                    <div class="form-field"><label>Дата и время погрузки <span class="req">*</span></label><input type="datetime-local" name="loading_time" required></div>
                                     <div class="form-field"><label>Перевозчик</label><input type="text" name="carrier" placeholder="ООО Ромашка"></div>
                                 </div>
 
@@ -335,6 +335,7 @@
 
                                 <div style="display:flex; gap:8px; margin-top:4px;">
                                     <button type="submit" class="btn btn-primary" id="create-btn">Создать заказ</button>
+                                    <button type="button" class="btn btn-secondary" id="create-test">Заполнить тестом</button>
                                     <button type="button" class="btn btn-secondary" id="create-reset">Очистить</button>
                                 </div>
                             </form>
@@ -508,6 +509,33 @@
         });
 
         // ============ СОЗДАНИЕ ============
+        $('#create-test').addEventListener('click', () => {
+            const form = $('#create-form');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const dateValue = [tomorrow.getFullYear(), String(tomorrow.getMonth() + 1).padStart(2, '0'), String(tomorrow.getDate()).padStart(2, '0')].join('-');
+            const sample = {
+                cargo_name: 'Тестовый груз, паллеты',
+                places: '12',
+                weight: '850',
+                length: '120',
+                width: '80',
+                height: '100',
+                from: 'Москва, склад №5',
+                to: 'Санкт-Петербург, склад №2',
+                loading_time: `${dateValue}T09:00`,
+                carrier: 'ООО Тестовая перевозка',
+                vehicle_brand: 'Volvo FH',
+                vehicle_plate: 'А123БВ77',
+                vehicle_trailer: 'ЕО123477',
+                phone_expected: '79990000000',
+            };
+            for (const [name, value] of Object.entries(sample)) {
+                form.elements[name].value = value;
+            }
+            phoneInput.dispatchEvent(new Event('input'));
+        });
+
         $('#create-reset').addEventListener('click', () => {
             $('#create-form').reset();
             phoneInput.classList.remove('valid', 'invalid');
@@ -521,6 +549,9 @@
             btn.innerHTML = '<span class="spinner"></span> Создание...';
 
             const fd = new FormData(e.target);
+            const loadingDate = fd.get('loading_time');
+            const [datePart, timePart] = loadingDate.split('T');
+            const [year, month, day] = datePart.split('-');
             const payload = {
                 number: fd.get('number'),
                 cargo: {
@@ -534,7 +565,7 @@
                 route: {
                     from: fd.get('from'),
                     to: fd.get('to'),
-                    loading_time: fd.get('loading_time'),
+                    loading_time: `${day}.${month}.${year} ${timePart}`,
                 },
                 carrier: fd.get('carrier'),
                 vehicle: {
