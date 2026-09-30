@@ -41,6 +41,7 @@ async function sendFormButton(userId, orderId) {
                     type: 'open_app',
                     text: '📝 Открыть форму осмотра',
                     web_app: botUsername,
+                    payload: orderId,
                 }]],
             },
         }]
