@@ -1,12 +1,17 @@
 import { checkAdminAuth } from './_lib/auth.js';
 import { getOrder, updateOrder } from './_lib/orders.js';
-import { generateInspectionHTML, generateInspectionPDF } from './_lib/documents.js';
+import { generateInspectionPDF } from './_lib/documents.js';
 
 const BOT_TOKEN = process.env.MAX_BOT_TOKEN;
 const BOT_API = 'https://platform-api2.max.ru';
 
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+}
+
+function reportFilename(order, version) {
+    const label = String(order.number || order.id).replace(/[^\p{L}\p{N}_-]+/gu, '_').slice(0, 60);
+    return `otchet-${label}-v${version}.pdf`;
 }
 
 async function sendReportFile(userId, pdf, filename, orderLabel) {
@@ -67,7 +72,8 @@ export async function GET(request) {
     if (!order.inspections?.length) return jsonResponse({ error: 'Осмотров нет' }, 400);
 
     const targetVersion = version || order.current_inspection;
-    const html = generateInspectionHTML(order, targetVersion);
+    const pdf = await generateInspectionPDF(order, targetVersion);
+    if (!pdf) return jsonResponse({ error: 'Осмотр не найден' }, 404);
 
     await updateOrder(id, {
         // отметим только последнюю версию
@@ -78,7 +84,14 @@ export async function GET(request) {
         ),
     }, 'document_generated', 'admin');
 
-    return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    const filename = reportFilename(order, targetVersion);
+    return new Response(pdf, {
+        status: 200,
+        headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="inspection-report.pdf"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+        },
+    });
 }
 
 export async function POST(request) {
@@ -102,11 +115,10 @@ export async function POST(request) {
     const pdf = await generateInspectionPDF(order, targetVersion);
     if (!pdf) return jsonResponse({ error: 'Осмотр не найден' }, 404);
     const orderLabel = String(order.number || order.id);
-    const safeLabel = orderLabel.replace(/[^\p{L}\p{N}_-]+/gu, '_').slice(0, 60);
     const result = await sendReportFile(
         userId,
         pdf,
-        `otchet-${safeLabel}-v${targetVersion}.pdf`,
+        reportFilename(order, targetVersion),
         orderLabel
     );
     if (!result.ok) return jsonResponse({ error: 'Не удалось отправить: ' + result.error }, 500);
