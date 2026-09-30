@@ -1,4 +1,9 @@
+import PDFDocument from 'pdfkit';
+import { readFileSync } from 'node:fs';
+
 const WATERMARK_TEXT = 'ДЕМО-ОТЧЁТ · НЕ ЯВЛЯЕТСЯ ЭТрН ИЛИ ЭКСПЕДИТОРСКОЙ РАСПИСКОЙ';
+const FONT_REGULAR = readFileSync(new URL('./fonts/NotoSans-Regular.ttf', import.meta.url));
+const FONT_BOLD = readFileSync(new URL('./fonts/NotoSans-Bold.ttf', import.meta.url));
 
 export function generateInspectionHTML(order, version) {
     const cargo = order.cargo || {};
@@ -153,6 +158,126 @@ export function generateSummaryText(order, version) {
     lines.push('_Это демо-отчёт. Не является ЭТрН или экспедиторской распиской._');
 
     return lines.join('\n');
+}
+
+export function generateInspectionPDF(order, version) {
+    const insp = (order.inspections || []).find(i => i.version === version);
+    if (!insp) return null;
+
+    const cargo = order.cargo || {};
+    const route = order.route || {};
+    const vehicle = order.vehicle || {};
+    const fio = `${insp.inspector?.first_name || ''} ${insp.inspector?.last_name || ''}`.trim() || '—';
+    const title = `Отчёт об осмотре — ${order.number || order.id}`;
+    const date = (insp.confirmed_at || '').slice(0, 16).replace('T', ' ') || '—';
+
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        const doc = new PDFDocument({ size: 'A4', margins: { top: 42, bottom: 50, left: 48, right: 48 }, bufferPages: true, info: { Title: title, Author: 'Cargo' } });
+        doc.on('data', chunk => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', reject);
+        doc.registerFont('Noto', FONT_REGULAR);
+        doc.registerFont('Noto-Bold', FONT_BOLD);
+
+        const left = 48;
+        const width = doc.page.width - left * 2;
+        const bottom = doc.page.height - 50;
+        const colors = { ink: '#172033', muted: '#64748b', blue: '#1d4ed8', pale: '#eff6ff', border: '#e2e8f0', green: '#047857', greenBg: '#ecfdf5', red: '#b91c1c', redBg: '#fef2f2' };
+
+        function newPageIfNeeded(height) {
+            if (doc.y + height > bottom) doc.addPage();
+        }
+
+        function sectionHeading(text) {
+            newPageIfNeeded(42);
+            doc.moveDown(0.55);
+            doc.font('Noto-Bold').fontSize(11).fillColor(colors.blue).text(text.toLocaleUpperCase('ru-RU'), left, doc.y, { characterSpacing: 0.7 });
+            doc.moveDown(0.35);
+            doc.moveTo(left, doc.y).lineTo(left + width, doc.y).lineWidth(1).strokeColor(colors.border).stroke();
+            doc.moveDown(0.45);
+        }
+
+        function infoRow(label, rawValue) {
+            const value = String(rawValue ?? '—') || '—';
+            const labelWidth = 132;
+            const valueX = left + labelWidth + 12;
+            const valueWidth = width - labelWidth - 12;
+            doc.font('Noto').fontSize(9.5);
+            const valueHeight = doc.heightOfString(value, { width: valueWidth, lineGap: 2 });
+            const rowHeight = Math.max(27, valueHeight + 12);
+            newPageIfNeeded(rowHeight + 2);
+            const y = doc.y;
+            doc.roundedRect(left, y, width, rowHeight, 5).fill('#f8fafc');
+            doc.font('Noto').fontSize(9).fillColor(colors.muted).text(label, left + 10, y + 8, { width: labelWidth - 14 });
+            doc.font('Noto-Bold').fontSize(9.5).fillColor(colors.ink).text(value, valueX, y + 7, { width: valueWidth - 10, lineGap: 2 });
+            doc.y = y + rowHeight + 4;
+        }
+
+        function paragraph(text, color = colors.ink, background = null) {
+            doc.font('Noto').fontSize(9.5);
+            const textHeight = doc.heightOfString(String(text), { width: width - 24, lineGap: 3 });
+            const boxHeight = textHeight + 18;
+            newPageIfNeeded(boxHeight + 4);
+            const y = doc.y;
+            if (background) doc.roundedRect(left, y, width, boxHeight, 6).fill(background);
+            doc.fillColor(color).text(String(text), left + 12, y + 9, { width: width - 24, lineGap: 3 });
+            doc.y = y + boxHeight + 4;
+        }
+
+        // Header
+        doc.roundedRect(left, 42, width, 96, 10).fill('#102a56');
+        doc.roundedRect(left + 18, 60, 4, 54, 2).fill('#60a5fa');
+        doc.font('Noto-Bold').fontSize(18).fillColor('#ffffff').text('ОТЧЁТ ОБ ОСМОТРЕ ГРУЗА', left + 34, 59, { width: width - 50 });
+        doc.font('Noto').fontSize(10).fillColor('#dbeafe').text(`Заказ ${order.number || order.id}  ·  версия ${insp.version}`, left + 34, 88, { width: width - 50 });
+        doc.font('Noto').fontSize(8).fillColor('#bfdbfe').text(`Дата осмотра: ${date}`, left + 34, 108, { width: width - 50 });
+        doc.y = 153;
+        const mismatches = (insp.answers || []).filter(answer => !answer.match).length;
+        if (insp.type === 'impossible') {
+            paragraph(`Осмотр невозможен. Причина: ${insp.impossible_reason || '—'}`, colors.red, colors.redBg);
+        } else {
+            paragraph(mismatches ? `Обнаружено расхождений: ${mismatches}` : 'По отмеченным пунктам расхождений нет', mismatches ? colors.red : colors.green, mismatches ? colors.redBg : colors.greenBg);
+        }
+
+        sectionHeading('Данные поручения');
+        infoRow('Номер поручения', order.number || order.id);
+        infoRow('Перевозчик', order.carrier || '—');
+        infoRow('Груз', cargo.name || '—');
+        infoRow('Количество мест', cargo.places ?? '—');
+        infoRow('Вес', `${cargo.weight ?? '—'} кг`);
+        infoRow('Габариты', `${cargo.length ?? '—'} × ${cargo.width ?? '—'} × ${cargo.height ?? '—'} см`);
+        infoRow('Маршрут', `${route.from || '—'} → ${route.to || '—'}`);
+        infoRow('Время погрузки', route.loading_time || '—');
+        infoRow('Транспорт', [vehicle.brand, vehicle.plate].filter(Boolean).join(', ') || '—');
+        if (vehicle.trailer) infoRow('Прицеп', vehicle.trailer);
+
+        sectionHeading('Водитель');
+        infoRow('ФИО', fio);
+        infoRow('Телефон', insp.inspector?.phone || '—');
+
+        if (insp.type !== 'impossible') {
+            sectionHeading('Результаты осмотра');
+            for (const answer of insp.answers || []) {
+                const label = answer.label || answer.key || 'Пункт';
+                const comment = answer.comment ? `\nКомментарий: ${answer.comment}` : '';
+                paragraph(`${answer.match ? 'СООТВЕТСТВУЕТ' : 'РАСХОЖДЕНИЕ'}  ·  ${label}${comment}`, answer.match ? colors.green : colors.red, answer.match ? '#f8fafc' : colors.redBg);
+            }
+            if (insp.overall_comment) {
+                sectionHeading('Общий комментарий');
+                paragraph(insp.overall_comment);
+            }
+        }
+
+        const pages = doc.bufferedPageRange();
+        for (let page = pages.start; page < pages.start + pages.count; page++) {
+            doc.switchToPage(page);
+            const footerY = doc.page.height - 34;
+            doc.moveTo(left, footerY - 8).lineTo(left + width, footerY - 8).lineWidth(0.7).strokeColor(colors.border).stroke();
+            doc.font('Noto').fontSize(7).fillColor(colors.muted).text('Демо-отчёт · Не является ЭТрН или экспедиторской распиской', left, footerY, { width: width - 60, lineBreak: false });
+            doc.text(`${page - pages.start + 1} / ${pages.count}`, left + width - 48, footerY, { width: 48, align: 'right', lineBreak: false });
+        }
+        doc.end();
+    });
 }
 
 function esc(s) {

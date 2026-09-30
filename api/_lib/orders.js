@@ -221,14 +221,22 @@ export function buildLoaderLinkRaw(orderId) {
 export async function shortenUrl(url) {
     if (!url) return null;
     try {
-        const res = await fetch(`https://clck.ru/--?url=${encodeURIComponent(url)}`);
+        const res = await fetch('https://clck.ru/--', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                Accept: 'text/plain',
+            },
+            body: new URLSearchParams({ url }),
+        });
         if (!res.ok) {
             console.error('clck.ru error:', res.status, await res.text());
             return url;
         }
         const short = (await res.text()).trim();
-        // clck.ru возвращает либо короткую ссылку, либо текст ошибки
-        if (!short.startsWith('http')) {
+        let shortUrl;
+        try { shortUrl = new URL(short); } catch {}
+        if (!shortUrl || !['clck.ru', 'www.clck.ru'].includes(shortUrl.hostname)) {
             console.error('clck.ru unexpected response:', short);
             return url;
         }
