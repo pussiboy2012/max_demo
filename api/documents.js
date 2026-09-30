@@ -84,12 +84,11 @@ export async function GET(request) {
         ),
     }, 'document_generated', 'admin');
 
-    const filename = reportFilename(order, targetVersion);
     return new Response(pdf, {
         status: 200,
         headers: {
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="inspection-report.pdf"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+            'Content-Disposition': `attachment; filename="inspection-report.pdf"; filename*=UTF-8''${encodeURIComponent(reportFilename(order, targetVersion))}`,
         },
     });
 }
