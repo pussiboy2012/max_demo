@@ -12,6 +12,10 @@ if (!REDIS_URL || !REDIS_TOKEN) {
  * @param {string[]} command — [CMD, ...args]
  */
 export async function command(cmdArray) {
+    if (!REDIS_URL || !REDIS_TOKEN) {
+        throw new Error('Upstash Redis is not configured. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.');
+    }
+
     const [cmdName, ...args] = cmdArray;
     const encoded = args.map((a) => encodeURIComponent(a)).join('/');
     const url = `${REDIS_URL}/${cmdName}/${encoded}`;

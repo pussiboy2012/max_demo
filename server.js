@@ -59,7 +59,11 @@ async function toWebRequest(req) {
 
     const method = (req.method || 'GET').toUpperCase();
     const init = { method, headers };
-    if (!['GET', 'HEAD'].includes(method)) init.body = await readBody(req);
+    if (!['GET', 'HEAD'].includes(method)) {
+        init.body = await readBody(req);
+        // Node.js requires this when constructing a Fetch Request with a body.
+        init.duplex = 'half';
+    }
     return new Request(url, init);
 }
 
@@ -120,9 +124,30 @@ async function handleStatic(req, res, pathname) {
 
 const server = http.createServer((req, res) => {
     const pathname = new URL(req.url || '/', 'http://localhost').pathname;
+    if (pathname === '/healthz') {
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+        return res.end(JSON.stringify({ status: 'ok' }));
+    }
     if (pathname.startsWith('/api/')) return void handleApi(req, res, pathname);
     return void handleStatic(req, res, pathname);
 });
 
 const port = Number(process.env.PORT) || 3000;
-server.listen(port, '0.0.0.0', () => console.log(`Cargo app listening on ${port}`));
+server.listen(port, '0.0.0.0', () => {
+    console.log(`Cargo app listening on 0.0.0.0:${port}`);
+    const missing = [];
+    if (!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL)) missing.push('UPSTASH_REDIS_REST_URL');
+    if (!(process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN)) missing.push('UPSTASH_REDIS_REST_TOKEN');
+    if (!process.env.ADMIN_PASSWORD) missing.push('ADMIN_PASSWORD');
+    if (!process.env.MAX_BOT_TOKEN) missing.push('MAX_BOT_TOKEN');
+    if (!process.env.BOT_USERNAME) missing.push('BOT_USERNAME');
+    if (missing.length) console.error(`Missing required environment variables: ${missing.join(', ')}`);
+});
+
+for (const signal of ['SIGTERM', 'SIGINT']) {
+    process.on(signal, () => {
+        console.log(`${signal} received; closing HTTP server`);
+        server.close(() => process.exit(0));
+        setTimeout(() => process.exit(1), 10_000).unref();
+    });
+}
