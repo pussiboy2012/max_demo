@@ -1,9 +1,10 @@
 import PDFDocument from 'pdfkit';
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 const WATERMARK_TEXT = 'ДЕМО-ОТЧЁТ · НЕ ЯВЛЯЕТСЯ ЭТрН ИЛИ ЭКСПЕДИТОРСКОЙ РАСПИСКОЙ';
-const FONT_REGULAR = readFileSync(new URL('./fonts/NotoSans-Regular.ttf', import.meta.url));
-const FONT_BOLD = readFileSync(new URL('./fonts/NotoSans-Bold.ttf', import.meta.url));
+const FONT_REGULAR = readFileSync(path.join(process.cwd(), 'api/_lib/fonts/NotoSans-Regular.ttf'));
+const FONT_BOLD = readFileSync(path.join(process.cwd(), 'api/_lib/fonts/NotoSans-Bold.ttf'));
 
 export function generateInspectionPDF(order, version) {
     const insp = (order.inspections || []).find(i => i.version === version);

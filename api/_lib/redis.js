@@ -3,10 +3,6 @@
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
-if (!REDIS_URL || !REDIS_TOKEN) {
-    console.error('❌ Не заданы переменные окружения для Upstash Redis!');
-}
-
 /**
  * Выполняет произвольную команду Redis через REST API Upstash.
  * @param {string[]} command — [CMD, ...args]
