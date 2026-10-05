@@ -818,6 +818,10 @@
                 a.push('<button type="button" class="btn btn-secondary" data-action="reject">✕ Отклонить</button>');
             }
 
+            if (o.status === 'recheck') {
+                a.push('<button type="button" class="btn btn-secondary" data-action="recheck">📨 Отправить запрос повторно</button>');
+            }
+
             if (o.status === 'created' || o.status === 'awaiting_phone' || o.status === 'awaiting_form' || o.status === 'recheck') {
                 if (o.loader && o.loader.phone_expected) {
                     a.push('<button type="button" class="btn btn-secondary" data-action="copy-link">🔗 Ссылка</button>');

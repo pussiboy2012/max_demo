@@ -1,11 +1,64 @@
 import { checkAdminAuth } from './_lib/auth.js';
 import { getOrder, updateOrder, deleteOrder, ORDER_STATUS, buildLoaderLink } from './_lib/orders.js';
 
+const MAX_BOT_TOKEN = process.env.MAX_BOT_TOKEN;
+const MAX_BOT_API = 'https://platform-api2.max.ru';
+
 function jsonResponse(body, status = 200) {
     return new Response(JSON.stringify(body), {
         status,
         headers: { 'Content-Type': 'application/json' },
     });
+}
+
+async function sendRecheckRequest(order, comment) {
+    const userId = order.loader?.max_user_id;
+    const botUsername = process.env.BOT_USERNAME;
+
+    if (!userId) return { ok: false, error: 'У водителя нет MAX user_id. Сначала водитель должен открыть бота по ссылке заказа.' };
+    if (!MAX_BOT_TOKEN) return { ok: false, error: 'На сервере не задан MAX_BOT_TOKEN.' };
+    if (!botUsername) return { ok: false, error: 'На сервере не задан BOT_USERNAME.' };
+
+    const details = String(comment || '').trim();
+    const text = [
+        `Назначен повторный осмотр груза по заказу ${order.number || order.id}.`,
+        details ? `Комментарий диспетчера: ${details}` : '',
+        'Нажмите кнопку ниже, чтобы открыть форму повторного осмотра.',
+    ].filter(Boolean).join('\n\n');
+
+    try {
+        const response = await fetch(`${MAX_BOT_API}/messages?user_id=${encodeURIComponent(userId)}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: MAX_BOT_TOKEN,
+            },
+            body: JSON.stringify({
+                text,
+                attachments: [{
+                    type: 'inline_keyboard',
+                    payload: {
+                        buttons: [[{
+                            type: 'open_app',
+                            text: '↻ Открыть форму повторного осмотра',
+                            web_app: botUsername,
+                            payload: order.id,
+                        }]],
+                    },
+                }],
+            }),
+        });
+
+        if (!response.ok) {
+            const details = await response.text();
+            console.error('MAX recheck message failed:', response.status, details);
+            return { ok: false, error: `MAX не принял сообщение (HTTP ${response.status}).` };
+        }
+        return { ok: true };
+    } catch (error) {
+        console.error('MAX recheck message request failed:', error);
+        return { ok: false, error: 'Не удалось связаться с MAX API.' };
+    }
 }
 
 export async function GET(request) {
@@ -57,16 +110,23 @@ export async function PATCH(request) {
     }
 
     if (action === 'recheck') {
+        const delivery = await sendRecheckRequest(order, comment);
+        if (!delivery.ok) {
+            return jsonResponse({ error: delivery.error }, 502);
+        }
+
+        const resolvedAt = new Date().toISOString();
         const updated = await updateOrder(id, {
             status: ORDER_STATUS.RECHECK,
             resolution: {
                 status: 'recheck',
                 comment: comment || '',
-                resolved_at: new Date().toISOString(),
+                resolved_at: resolvedAt,
                 resolved_by: 'admin',
+                notification_sent_at: resolvedAt,
             },
         }, 'recheck_assigned', 'admin');
-        return jsonResponse({ success: true, order: updated });
+        return jsonResponse({ success: true, order: updated, notification_sent: true });
     }
 
     if (action === 'reject') {
